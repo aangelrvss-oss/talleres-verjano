@@ -556,6 +556,11 @@ const brands = [
     /* El texto va sobre la mitad inferior: degradado suficiente para fotos claras (pérgola blanca) */
     background: linear-gradient(180deg, rgb(13 22 32 / 0) 20%, rgb(13 22 32 / 0.72) 55%, rgb(13 22 32 / 0.94) 100%);
   }
+  /* Tarjetas secundarias: el texto ocupa más altura relativa; el degradado empieza antes
+     para que el contador (texto pequeño) mantenga 4,5:1 sobre las zonas claras de la foto */
+  .tile:not(.tile--lg)::after {
+    background: linear-gradient(180deg, rgb(13 22 32 / 0.15) 0%, rgb(13 22 32 / 0.8) 42%, rgb(13 22 32 / 0.95) 100%);
+  }
   .tile__body {
     align-self: end;
     display: grid;
@@ -1003,12 +1008,28 @@ const brands = [
       grid-template-columns: 1fr;
       grid-template-rows: none;
     }
+    /* Una columna: foto arriba y texto debajo sobre tinta. Con el texto encima de la
+       foto no se puede garantizar 4,5:1 sobre zonas claras (cielo, lamas blancas). */
+    .tile,
     .tile--lg {
       grid-row: auto;
-      min-height: 28rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
-    .tile {
-      min-height: 19rem;
+    .tile__media {
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      aspect-ratio: 16 / 9;
+    }
+    .tile::after,
+    .tile:not(.tile--lg)::after {
+      display: none;
+    }
+    .tile__body {
+      align-self: stretch;
+      background: var(--c-ink);
     }
     .rail {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1068,12 +1089,8 @@ const brands = [
       right: var(--s-3);
       bottom: var(--s-3);
     }
-    .tile::after {
-      background: linear-gradient(180deg, rgb(13 22 32 / 0.1) 0%, rgb(13 22 32 / 0.7) 45%, rgb(13 22 32 / 0.95) 100%);
-    }
-    .tile,
-    .tile--lg {
-      min-height: 22rem;
+    .tile__media {
+      aspect-ratio: 4 / 3;
     }
   }
 </style>
