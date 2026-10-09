@@ -1,0 +1,398 @@
+---
+import Icon from './Icon.astro';
+import { categories, productsIn } from '../data/catalog';
+import { site, primaryPhone, primaryEmail } from '../data/site';
+
+/**
+ * Formulario de presupuesto.
+ * Envía a /api/contacto.php (public/api/contacto.php), que valida de nuevo en
+ * el servidor y envía el correo. El mensaje de éxito solo se muestra si el
+ * servidor confirma el envío. Sin JavaScript, el formulario se envía de forma
+ * tradicional y el servidor redirige a /contacto/enviado/.
+ */
+interface Props {
+  endpoint?: string;
+}
+
+const { endpoint = '/api/contacto.php' } = Astro.props;
+---
+
+<div class="quote" data-quote>
+  <form class="form" action={endpoint} method="post" novalidate data-form>
+    <div class="form__summary" role="alert" tabindex="-1" hidden data-summary>
+      <p><strong>Revise los siguientes campos:</strong></p>
+      <ul data-summary-list></ul>
+    </div>
+
+    <div class="form__grid">
+      <div class="field">
+        <label for="f-nombre">Nombre <span class="req" aria-hidden="true">*</span></label>
+        <input id="f-nombre" name="nombre" type="text" autocomplete="name" required maxlength="100" aria-describedby="e-nombre" />
+        <p class="field-error" id="e-nombre" data-error-for="nombre"></p>
+      </div>
+
+      <div class="field">
+        <label for="f-telefono">Teléfono</label>
+        <input
+          id="f-telefono"
+          name="telefono"
+          type="tel"
+          autocomplete="tel"
+          inputmode="tel"
+          maxlength="30"
+          aria-describedby="h-contacto e-telefono"
+        />
+        <p class="field-error" id="e-telefono" data-error-for="telefono"></p>
+      </div>
+
+      <div class="field">
+        <label for="f-email">Correo electrónico</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" maxlength="150" aria-describedby="h-contacto e-email" />
+        <p class="field-error" id="e-email" data-error-for="email"></p>
+      </div>
+
+      <div class="field">
+        <label for="f-producto">¿Qué le interesa?</label>
+        <select id="f-producto" name="producto">
+          <option value="">Seleccione (opcional)</option>
+          {
+            categories.map((c) => (
+              <optgroup label={c.name}>
+                {productsIn(c.slug).map((p) => (
+                  <option value={p.slug}>{p.name}</option>
+                ))}
+              </optgroup>
+            ))
+          }
+          <option value="otro">Otro / no lo sé todavía</option>
+        </select>
+      </div>
+
+      <p class="hint form__hint" id="h-contacto">Indíquenos al menos un teléfono o un correo para poder responderle.</p>
+
+      <div class="field form__full">
+        <label for="f-mensaje">Cuéntenos qué necesita <span class="req" aria-hidden="true">*</span></label>
+        <textarea
+          id="f-mensaje"
+          name="mensaje"
+          rows="6"
+          required
+          maxlength="3000"
+          aria-describedby="h-mensaje e-mensaje"></textarea>
+        <p class="hint" id="h-mensaje">Por ejemplo: número de ventanas, medidas aproximadas, tipo de apertura o si es obra nueva o reforma.</p>
+        <p class="field-error" id="e-mensaje" data-error-for="mensaje"></p>
+      </div>
+
+      <div class="field form__full form__check">
+        <div class="check">
+          <input id="f-privacidad" name="privacidad" type="checkbox" value="1" required aria-describedby="e-privacidad" />
+          <label for="f-privacidad">
+            He leído y acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad<span class="visually-hidden"> (pestaña nueva)</span></a>. <span class="req" aria-hidden="true">*</span>
+          </label>
+        </div>
+        <p class="field-error" id="e-privacidad" data-error-for="privacidad"></p>
+      </div>
+
+      <!-- Trampa anti-spam: los usuarios no ven ni rellenan este campo -->
+      <div class="hp" aria-hidden="true">
+        <label for="f-web">No rellene este campo</label>
+        <input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="t" value="" data-ts />
+    </div>
+
+    <div class="form__footer">
+      <p class="hint"><span class="req" aria-hidden="true">*</span> Campos obligatorios</p>
+      <button class="btn btn--primary form__submit" type="submit" data-submit>
+        <span data-submit-label>Enviar solicitud</span>
+        <Icon name="arrow" size={18} />
+      </button>
+    </div>
+
+    <div class="form__status form__status--error" role="alert" hidden data-status-error>
+      <Icon name="alert" size={22} />
+      <div>
+        <p><strong>No hemos podido enviar su solicitud.</strong> <span data-status-error-text></span></p>
+        <p>
+          Puede intentarlo de nuevo o contactar directamente en el
+          <a href={primaryPhone.href}>{primaryPhone.display}</a> o en
+          <a href={`mailto:${primaryEmail.address}`}>{primaryEmail.address}</a>.
+        </p>
+      </div>
+    </div>
+  </form>
+
+  <div class="form__status form__status--ok" role="status" tabindex="-1" hidden data-status-ok>
+    <Icon name="check" size={28} />
+    <div>
+      <p class="form__ok-title">Solicitud enviada</p>
+      <p>Gracias. Hemos recibido su mensaje y {site.name} se pondrá en contacto con usted lo antes posible.</p>
+      <p>Si es urgente, llámenos al <a href={primaryPhone.href}>{primaryPhone.display}</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  type Rule = { name: string; check: (f: FormData) => string | null };
+
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const PHONE = /^[+()\d\s.-]{9,30}$/;
+
+  const rules: Rule[] = [
+    { name: 'nombre', check: (f) => (String(f.get('nombre') ?? '').trim().length < 2 ? 'Escriba su nombre.' : null) },
+    {
+      name: 'telefono',
+      check: (f) => {
+        const tel = String(f.get('telefono') ?? '').trim();
+        const mail = String(f.get('email') ?? '').trim();
+        if (!tel && !mail) return 'Indique un teléfono o un correo electrónico.';
+        if (tel && !PHONE.test(tel)) return 'El teléfono no parece válido. Use solo números (mínimo 9).';
+        return null;
+      },
+    },
+    {
+      name: 'email',
+      check: (f) => {
+        const mail = String(f.get('email') ?? '').trim();
+        return mail && !EMAIL.test(mail) ? 'El correo electrónico no parece válido (ejemplo: nombre@dominio.es).' : null;
+      },
+    },
+    {
+      name: 'mensaje',
+      check: (f) => (String(f.get('mensaje') ?? '').trim().length < 10 ? 'Cuéntenos brevemente qué necesita (mínimo 10 caracteres).' : null),
+    },
+    { name: 'privacidad', check: (f) => (f.get('privacidad') ? null : 'Debe aceptar la política de privacidad.') },
+  ];
+
+  const labels: Record<string, string> = {
+    nombre: 'Nombre',
+    telefono: 'Teléfono o correo',
+    email: 'Correo electrónico',
+    mensaje: 'Mensaje',
+    privacidad: 'Política de privacidad',
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-quote]').forEach((root) => {
+    const form = root.querySelector<HTMLFormElement>('[data-form]')!;
+    const summary = root.querySelector<HTMLElement>('[data-summary]')!;
+    const summaryList = root.querySelector<HTMLUListElement>('[data-summary-list]')!;
+    const submit = root.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const submitLabel = root.querySelector<HTMLElement>('[data-submit-label]')!;
+    const errorBox = root.querySelector<HTMLElement>('[data-status-error]')!;
+    const errorText = root.querySelector<HTMLElement>('[data-status-error-text]')!;
+    const okBox = root.querySelector<HTMLElement>('[data-status-ok]')!;
+    const ts = root.querySelector<HTMLInputElement>('[data-ts]');
+    if (ts) ts.value = String(Date.now());
+
+    // Preselección desde las fichas: /contacto/?producto=abatibles#presupuesto
+    const preset = new URLSearchParams(location.search).get('producto');
+    const select = form.querySelector<HTMLSelectElement>('select[name="producto"]');
+    if (preset && select && [...select.options].some((o) => o.value === preset)) select.value = preset;
+
+    const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | null;
+
+    const showErrors = (errors: { name: string; msg: string }[]) => {
+      rules.forEach(({ name }) => {
+        const el = field(name);
+        const out = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+        const err = errors.find((e) => e.name === name);
+        el?.setAttribute('aria-invalid', err ? 'true' : 'false');
+        if (out) out.textContent = err ? err.msg : '';
+      });
+      summaryList.replaceChildren(
+        ...errors.map((e) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${field(e.name)?.id ?? ''}`;
+          a.textContent = `${labels[e.name]}: ${e.msg}`;
+          a.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            field(e.name)?.focus();
+          });
+          li.append(a);
+          return li;
+        }),
+      );
+      summary.hidden = errors.length === 0;
+    };
+
+    const validate = () => {
+      const data = new FormData(form);
+      return rules.flatMap(({ name, check }) => {
+        const msg = check(data);
+        return msg ? [{ name, msg }] : [];
+      });
+    };
+
+    // Revalida un campo al salir de él, solo si ya estaba marcado como erróneo
+    form.addEventListener('focusout', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.getAttribute('aria-invalid') !== 'true') return;
+      if (!validate().some((er) => er.name === target.name)) {
+        target.setAttribute('aria-invalid', 'false');
+        const out = form.querySelector<HTMLElement>(`[data-error-for="${target.name}"]`);
+        if (out) out.textContent = '';
+      }
+    });
+
+    const setSending = (sending: boolean) => {
+      submit.disabled = sending;
+      submit.setAttribute('aria-busy', String(sending));
+      submitLabel.textContent = sending ? 'Enviando…' : 'Enviar solicitud';
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.hidden = true;
+      const errors = validate();
+      showErrors(errors);
+      if (errors.length) {
+        summary.focus();
+        return;
+      }
+
+      setSending(true);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        let body: { ok?: boolean; error?: string; fields?: Record<string, string> } = {};
+        try {
+          body = await res.json();
+        } catch {
+          body = {};
+        }
+        if (res.ok && body.ok === true) {
+          form.hidden = true;
+          okBox.hidden = false;
+          okBox.focus();
+          return;
+        }
+        if (body.fields && Object.keys(body.fields).length) {
+          showErrors(Object.entries(body.fields).map(([name, msg]) => ({ name, msg })));
+          summary.focus();
+        } else {
+          errorText.textContent = body.error ?? 'El servidor no ha confirmado el envío.';
+          errorBox.hidden = false;
+          errorBox.scrollIntoView({ block: 'nearest' });
+        }
+      } catch {
+        errorText.textContent = 'Compruebe su conexión a internet.';
+        errorBox.hidden = false;
+      } finally {
+        setSending(false);
+      }
+    });
+  });
+</script>
+
+<style>
+  .form {
+    display: grid;
+    gap: var(--s-5);
+  }
+  .form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  .form__full,
+  .form__hint {
+    grid-column: 1 / -1;
+  }
+  .form__hint {
+    margin-top: calc(-1 * var(--s-3));
+  }
+  .check {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-3);
+    align-items: start;
+  }
+  .check input {
+    width: 1.375rem;
+    height: 1.375rem;
+    min-height: 0;
+    margin: 0.15rem 0 0;
+    accent-color: var(--c-brand);
+  }
+  .check label {
+    font-weight: 500;
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .form__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+  .form__submit {
+    min-width: 13rem;
+  }
+  .form__summary {
+    padding: var(--s-4) var(--s-5);
+    border: 1.5px solid var(--c-error);
+    border-left-width: 4px;
+    border-radius: var(--radius);
+    background: var(--c-error-tint);
+    color: var(--c-ink);
+  }
+  .form__summary ul {
+    margin-top: var(--s-2);
+    padding-left: var(--s-5);
+  }
+  .form__summary a {
+    color: var(--c-error);
+    font-weight: 600;
+  }
+  .form__status {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-4);
+    padding: var(--s-5);
+    border-radius: var(--radius-lg);
+  }
+  .form__status > div {
+    display: grid;
+    gap: var(--s-2);
+  }
+  .form__status--error {
+    background: var(--c-error-tint);
+    color: var(--c-ink);
+  }
+  .form__status--error :global(svg) {
+    color: var(--c-error);
+  }
+  .form__status--ok {
+    background: var(--c-success-tint);
+    border: 1.5px solid var(--c-success);
+  }
+  .form__status--ok :global(svg) {
+    color: var(--c-success);
+  }
+  .form__ok-title {
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    color: var(--c-ink);
+  }
+  [hidden] {
+    display: none !important;
+  }
+  @media (max-width: 40rem) {
+    .form__grid {
+      grid-template-columns: 1fr;
+    }
+    .form__submit {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+import type { Section } from '../data/catalog';
+
+interface Props {
+  sections: Section[];
+}
+
+const { sections } = Astro.props;
+---
+
+<div class="prose">
+  {
+    sections.map((s) => (
+      <>
+        <h2>{s.heading}</h2>
+        {s.blocks.map((b) =>
+          b.type === 'p' ? (
+            <p>{b.text}</p>
+          ) : b.type === 'list' ? (
+            <ul>
+              {b.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <dl class="specs">
+              {b.items.map(([label, value]) => (
+                <div>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          ),
+        )}
+      </>
+    ))
+  }
+</div>

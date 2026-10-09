@@ -1,0 +1,26 @@
+# Generado por scripts/gen-redirects.mjs a partir de docs/redirect-map.csv. No editar a mano.
+/index.php / 301
+/index.html / 301
+/01aluminio_sistemas_abatibles.html /sistemas-aluminio/abatibles/ 301
+/01aluminio_sistemas_corredera.html /sistemas-aluminio/correderas/ 301
+/01aluminio_sistemas_elevables.html /sistemas-aluminio/elevables/ 301
+/01aluminio_sistemas_mallorquina.html /sistemas-aluminio/mallorquinas/ 301
+/01aluminio_sistemas_libro.html /sistemas-aluminio/muro-cortina/ 301
+/01aluminio_sistemas_sistemas_libro.html /sistemas-aluminio/ 301
+/02materiales_adicionales_acristalamientos.html /materiales-adicionales/vidrios-acristalamientos/ 301
+/02materiales_adicionales_persianas_y_compactos.html /materiales-adicionales/persianas-compactos/ 301
+/02materiales_adicionales_automatismos.html /materiales-adicionales/domotica-automatismos/ 301
+/02materiales_adicionales_mosquiteras.html /materiales-adicionales/mosquiteras/ 301
+/01materiales_adicionales_automatismos.html /materiales-adicionales/domotica-automatismos/ 301
+/03_otros_productos_hierro_y_forja.html /otros-productos/hierro-forja/ 301
+/03_otros_productos_toldos.html /otros-productos/toldos-pergolas/ 301
+/03_otros_productos_frentes_de_armario.html /otros-productos/frentes-armario/ 301
+/03_otros_productos_mamparas_de_bano.html /otros-productos/mamparas-bano/ 301
+/03_otros_productos_mamapras_de_bano.html /otros-productos/mamparas-bano/ 301
+/03_otros_productos_cerrajeria.html /otros-productos/cerrajeria/ 301
+/03_otros_productos_estores.html /otros-productos/estores/ 301
+/03_otros_productos_aluminio_modular.html /consejos/ 301
+/03_otros_productos_cierres_de_seguridad.html /consejos/rotura-puente-termico/ 301
+/04contacto.html /contacto/ 301
+/02reformas_en_general.html / 301
+/02sistemas_en_pvc.html / 301

@@ -1,0 +1,4 @@
+# Solo el receptor del formulario es accesible desde la web
+<FilesMatch "^(?!contacto\.php$).*$">
+  Require all denied
+</FilesMatch>

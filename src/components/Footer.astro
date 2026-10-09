@@ -1,0 +1,172 @@
+---
+import Icon from './Icon.astro';
+import { categories, productsIn, productUrl, categoryUrl } from '../data/catalog';
+import { site, fullAddress } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__about">
+      <p class="footer__name">{site.name}</p>
+      <p>Carpintería de aluminio en Madrid desde {site.foundingYear}. Fabricación e instalación de ventanas, puertas y cerramientos.</p>
+      <ul class="footer__contact">
+        <li>
+          <Icon name="pin" size={18} />
+          <a href={site.mapsUrl} rel="noopener" target="_blank">
+            {fullAddress}<span class="visually-hidden"> (abre Google Maps en una pestaña nueva)</span>
+          </a>
+        </li>
+        {
+          site.phones.map((p) => (
+            <li>
+              <Icon name="phone" size={18} />
+              <a href={p.href}>
+                <span class="visually-hidden">{p.label}: </span>
+                {p.display}
+              </a>
+            </li>
+          ))
+        }
+        {
+          site.emails.map((e) => (
+            <li>
+              <Icon name="mail" size={18} />
+              <a href={`mailto:${e.address}`}>{e.address}</a>
+            </li>
+          ))
+        }
+        <li>
+          <Icon name="clock" size={18} />
+          <span>{site.hours.lines.join(': ')}{!site.hours.confirmed && <span class="footer__note"> (pendiente de confirmar)</span>}</span>
+        </li>
+      </ul>
+    </div>
+
+    {
+      categories.map((c) => (
+        <nav class="footer__col" aria-label={c.name}>
+          <p class="footer__title">
+            <a href={categoryUrl(c.slug)}>{c.name}</a>
+          </p>
+          <ul>
+            {productsIn(c.slug).map((p) => (
+              <li>
+                <a href={productUrl(p)}>{p.name}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+
+    <nav class="footer__col" aria-label="Empresa">
+      <p class="footer__title">Empresa</p>
+      <ul>
+        <li><a href="/empresa/">La empresa</a></li>
+        <li><a href="/consejos/">Consejos</a></li>
+        <li><a href="/contacto/">Contacto</a></li>
+        <li><a href="/contacto/#presupuesto">Pedir presupuesto</a></li>
+        <li><a href="/privacidad/">Política de privacidad</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <p>© {year} {site.name}. Todos los derechos reservados.</p>
+      <p>Las imágenes de producto son ilustrativas.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: #0d1620;
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+    color: #c9d2dc;
+    font-size: var(--fs-sm);
+  }
+  .footer a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .footer a:hover {
+    color: var(--c-white);
+    text-decoration: underline;
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(4, 1fr);
+    gap: var(--s-7) var(--s-6);
+    padding-block: var(--s-8) var(--s-7);
+  }
+  .footer__about {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+  .footer__name {
+    color: var(--c-white);
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .footer__contact {
+    list-style: none;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .footer__contact li {
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: var(--s-3);
+    align-items: start;
+  }
+  .footer__contact svg {
+    margin-top: 0.2rem;
+    color: #ff8a8d;
+  }
+  .footer__note {
+    color: #9eabb8;
+  }
+  .footer__title {
+    color: var(--c-white);
+    font-weight: 750;
+    margin-bottom: var(--s-4);
+  }
+  .footer__col ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .footer__col li a {
+    display: inline-block;
+    padding-block: 0.15rem;
+  }
+  .footer__bottom {
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .footer__bottom-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-5);
+    padding-block: var(--s-5);
+    color: #9eabb8;
+    font-size: var(--fs-xs);
+  }
+  @media (max-width: 68rem) {
+    .footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer__about {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 34rem) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

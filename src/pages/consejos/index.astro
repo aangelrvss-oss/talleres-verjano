@@ -1,0 +1,98 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { guides } from '../../data/guides';
+
+const breadcrumbs = [
+  { name: 'Inicio', href: '/' },
+  { name: 'Consejos', href: '/consejos/' },
+];
+---
+
+<Base
+  title="Consejos sobre ventanas, aislamiento y vidrios"
+  description="Guías prácticas de Talleres Verjano: qué es la rotura de puente térmico y cómo ahorrar energía eligiendo bien el vidrio de sus ventanas."
+  breadcrumbs={breadcrumbs}
+>
+  <PageHero
+    title="Consejos para elegir bien sus ventanas"
+    eyebrow="Consejos"
+    lead="Información práctica, basada en los sistemas que instalamos, para que tome decisiones con criterio antes de pedir presupuesto."
+    breadcrumbs={breadcrumbs}
+  />
+  <section class="section">
+    <div class="container">
+      <ul class="list">
+        {
+          guides.map((g) => (
+            <li>
+              <article class="item">
+                <h2>
+                  <a href={`/consejos/${g.slug}/`}>{g.title}</a>
+                </h2>
+                <p>{g.excerpt}</p>
+                <span class="item__more" aria-hidden="true">
+                  Leer guía <Icon name="arrow" size={16} />
+                </span>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+  <CtaBand />
+</Base>
+
+<style>
+  .list {
+    list-style: none;
+    display: grid;
+    gap: var(--s-5);
+    max-width: 52rem;
+  }
+  .item {
+    position: relative;
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-6);
+    border: 1px solid var(--c-line);
+    border-left: 4px solid var(--c-brand);
+    border-radius: var(--radius-lg);
+  }
+  .item:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .item:focus-within {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 2px;
+  }
+  h2 {
+    font-size: var(--fs-xl);
+  }
+  h2 a {
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  h2 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  h2 a:focus-visible {
+    outline: none;
+  }
+  p {
+    color: var(--c-ink-soft);
+  }
+  .item__more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--c-blue);
+  }
+</style>

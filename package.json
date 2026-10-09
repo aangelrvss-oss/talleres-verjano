@@ -1,0 +1,28 @@
+{
+  "name": "talleres-verjano-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Nueva web de Talleres Verjano (sitio estático generado con Astro)",
+  "scripts": {
+    "predev": "node scripts/gen-redirects.mjs",
+    "dev": "astro dev",
+    "prebuild": "node scripts/gen-redirects.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "node scripts/check-site.mjs",
+    "test:e2e": "playwright test",
+    "test": "npm run build && npm run check && npm run test:e2e"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "astro": "^5.18.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}

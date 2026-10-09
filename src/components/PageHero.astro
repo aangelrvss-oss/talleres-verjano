@@ -1,0 +1,85 @@
+---
+import type { Crumb } from '../layouts/Base.astro';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  lead?: string;
+  breadcrumbs?: Crumb[];
+}
+
+const { title, eyebrow, lead, breadcrumbs = [] } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="container page-hero__inner">
+    {
+      breadcrumbs.length > 1 && (
+        <nav class="crumbs" aria-label="Migas de pan">
+          <ol>
+            {breadcrumbs.map((c, i) => (
+              <li>
+                {i < breadcrumbs.length - 1 ? <a href={c.href}>{c.name}</a> : <span aria-current="page">{c.name}</span>}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    background:
+      linear-gradient(90deg, var(--c-grid) 1px, transparent 1px) 0 0 / 6rem 100%,
+      var(--c-surface);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .page-hero__inner {
+    display: grid;
+    gap: var(--s-4);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  h1 {
+    font-size: var(--fs-3xl);
+    font-weight: 800;
+    max-width: 22ch;
+  }
+  .lead {
+    max-width: 46rem;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+    list-style: none;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-muted);
+  }
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .crumbs li + li::before {
+    content: '/';
+    color: var(--c-line-strong);
+  }
+  .crumbs a {
+    color: var(--c-ink-soft);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--c-blue);
+    text-decoration: underline;
+  }
+  .crumbs [aria-current] {
+    color: var(--c-ink);
+  }
+</style>

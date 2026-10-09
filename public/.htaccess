@@ -1,0 +1,67 @@
+# Generado por scripts/gen-redirects.mjs a partir de docs/redirect-map.csv. No editar a mano.
+Options -Indexes
+DirectoryIndex index.html index.php
+ErrorDocument 404 /404.html
+
+AddDefaultCharset UTF-8
+AddType image/avif .avif
+AddType image/webp .webp
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  <FilesMatch "\.(css|js|woff2|avif|webp|jpg|jpeg|png|svg)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Los recursos con hash de Astro no cambian nunca
+<IfModule mod_headers.c>
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/plain application/xml
+</IfModule>
+
+# --- Forzar HTTPS y www (descomentar SOLO si el certificado cubre www y el
+# --- alojamiento no lo hace ya; probar antes en el entorno de pruebas)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off [OR]
+# RewriteCond %{HTTP_HOST} !^www\. [NC]
+# RewriteRule ^ https://www.talleresverjano.com%{REQUEST_URI} [L,R=301]
+
+# --- Redirecciones permanentes de la web antigua
+RedirectMatch 301 ^/index\.php$ /
+RedirectMatch 301 ^/index\.html$ /
+RedirectMatch 301 ^/01aluminio_sistemas_abatibles\.html$ /sistemas-aluminio/abatibles/
+RedirectMatch 301 ^/01aluminio_sistemas_corredera\.html$ /sistemas-aluminio/correderas/
+RedirectMatch 301 ^/01aluminio_sistemas_elevables\.html$ /sistemas-aluminio/elevables/
+RedirectMatch 301 ^/01aluminio_sistemas_mallorquina\.html$ /sistemas-aluminio/mallorquinas/
+RedirectMatch 301 ^/01aluminio_sistemas_libro\.html$ /sistemas-aluminio/muro-cortina/
+RedirectMatch 301 ^/01aluminio_sistemas_sistemas_libro\.html$ /sistemas-aluminio/
+RedirectMatch 301 ^/02materiales_adicionales_acristalamientos\.html$ /materiales-adicionales/vidrios-acristalamientos/
+RedirectMatch 301 ^/02materiales_adicionales_persianas_y_compactos\.html$ /materiales-adicionales/persianas-compactos/
+RedirectMatch 301 ^/02materiales_adicionales_automatismos\.html$ /materiales-adicionales/domotica-automatismos/
+RedirectMatch 301 ^/02materiales_adicionales_mosquiteras\.html$ /materiales-adicionales/mosquiteras/
+RedirectMatch 301 ^/01materiales_adicionales_automatismos\.html$ /materiales-adicionales/domotica-automatismos/
+RedirectMatch 301 ^/03_otros_productos_hierro_y_forja\.html$ /otros-productos/hierro-forja/
+RedirectMatch 301 ^/03_otros_productos_toldos\.html$ /otros-productos/toldos-pergolas/
+RedirectMatch 301 ^/03_otros_productos_frentes_de_armario\.html$ /otros-productos/frentes-armario/
+RedirectMatch 301 ^/03_otros_productos_mamparas_de_bano\.html$ /otros-productos/mamparas-bano/
+RedirectMatch 301 ^/03_otros_productos_mamapras_de_bano\.html$ /otros-productos/mamparas-bano/
+RedirectMatch 301 ^/03_otros_productos_cerrajeria\.html$ /otros-productos/cerrajeria/
+RedirectMatch 301 ^/03_otros_productos_estores\.html$ /otros-productos/estores/
+RedirectMatch 301 ^/03_otros_productos_aluminio_modular\.html$ /consejos/
+RedirectMatch 301 ^/03_otros_productos_cierres_de_seguridad\.html$ /consejos/rotura-puente-termico/
+RedirectMatch 301 ^/04contacto\.html$ /contacto/
+RedirectMatch 301 ^/02reformas_en_general\.html$ /
+RedirectMatch 301 ^/02sistemas_en_pvc\.html$ /

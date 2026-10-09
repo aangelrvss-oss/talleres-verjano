@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { categories, categoryUrl } from '../data/catalog';
+import { primaryPhone } from '../data/site';
+---
+
+<Base title="Página no encontrada" description="La página que busca no existe o ha cambiado de dirección." noindex>
+  <PageHero
+    title="No encontramos esta página"
+    eyebrow="Error 404"
+    lead="Es posible que la dirección haya cambiado con la nueva web. Estas secciones pueden ayudarle:"
+  >
+    <ul class="links">
+      {categories.map((c) => <li><a href={categoryUrl(c.slug)}>{c.name}</a></li>)}
+      <li><a href="/contacto/">Contacto</a></li>
+      <li><a href="/">Página de inicio</a></li>
+    </ul>
+    <p>¿Prefiere hablar con nosotros? Llame al <a href={primaryPhone.href}>{primaryPhone.display}</a>.</p>
+  </PageHero>
+</Base>
+
+<style>
+  .links {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  .links a {
+    display: inline-block;
+    padding: var(--s-2) var(--s-4);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius);
+    background: var(--c-white);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .links a:hover {
+    border-color: var(--c-blue);
+  }
+</style>

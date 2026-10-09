@@ -1,0 +1,83 @@
+---
+import type { SeriesTable } from '../data/catalog';
+
+interface Props {
+  series: SeriesTable;
+}
+
+const { series } = Astro.props;
+---
+
+<figure class="series">
+  <div class="series__scroll" tabindex="0" role="region" aria-label={series.caption}>
+    <table>
+      <caption>{series.caption}</caption>
+      <thead>
+        <tr>{series.columns.map((c) => <th scope="col">{c}</th>)}</tr>
+      </thead>
+      <tbody>
+        {
+          series.rows.map((row) => (
+            <tr>
+              {row.map((cell, i) => (i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  {series.note && <figcaption>{series.note}</figcaption>}
+</figure>
+
+<style>
+  .series {
+    margin: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .series__scroll {
+    overflow-x: auto;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+  }
+  table {
+    width: 100%;
+    min-width: 34rem;
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  caption {
+    text-align: left;
+    padding: var(--s-4) var(--s-4) var(--s-3);
+    font-weight: 750;
+    color: var(--c-ink);
+  }
+  th,
+  td {
+    padding: 0.7rem var(--s-4);
+    text-align: left;
+    border-top: 1px solid var(--c-line);
+    white-space: nowrap;
+  }
+  thead th {
+    background: var(--c-surface);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink-soft);
+  }
+  tbody th {
+    font-weight: 800;
+    color: var(--c-ink);
+  }
+  td {
+    color: var(--c-ink-soft);
+  }
+  tbody tr:hover {
+    background: #fafbfa;
+  }
+  figcaption {
+    font-size: var(--fs-xs);
+    color: var(--c-muted);
+  }
+</style>

@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Sections from '../../components/Sections.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { guides, type Guide } from '../../data/guides';
+import { getProduct, type Product } from '../../data/catalog';
+
+export function getStaticPaths() {
+  return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+}
+
+interface Props {
+  guide: Guide;
+}
+
+const { guide } = Astro.props;
+const related = guide.relatedProducts.map((s) => getProduct(s)).filter((p): p is Product => Boolean(p));
+const breadcrumbs = [
+  { name: 'Inicio', href: '/' },
+  { name: 'Consejos', href: '/consejos/' },
+  { name: guide.title, href: `/consejos/${guide.slug}/` },
+];
+---
+
+<Base title={guide.metaTitle} description={guide.metaDescription} ogImage={related[0]?.image} breadcrumbs={breadcrumbs}>
+  <PageHero title={guide.title} eyebrow="Consejos" lead={guide.excerpt} breadcrumbs={breadcrumbs} />
+  <article class="section">
+    <div class="container narrow">
+      <Sections sections={guide.sections} />
+    </div>
+  </article>
+  <section class="section section--surface" aria-labelledby="rel-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Productos</p>
+        <h2 id="rel-title">Productos relacionados con esta guía</h2>
+      </div>
+      <div class="grid grid--4">
+        {related.map((p) => <ProductCard product={p} />)}
+      </div>
+    </div>
+  </section>
+  <CtaBand />
+</Base>
+
+<style>
+  .narrow {
+    max-width: calc(46rem + 2 * var(--gutter));
+  }
+</style>

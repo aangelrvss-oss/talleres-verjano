@@ -1,0 +1,114 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Product } from '../data/catalog';
+import { productUrl } from '../data/catalog';
+
+interface Props {
+  product: Product;
+  headingLevel?: 'h2' | 'h3';
+  eager?: boolean;
+}
+
+const { product, headingLevel = 'h3', eager = false } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class="card">
+  <div class="card__media">
+    <Image
+      src={product.image}
+      alt=""
+      widths={[360, 560, 765]}
+      sizes="(max-width: 40rem) 100vw, (max-width: 75rem) 50vw, 380px"
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  </div>
+  <div class="card__body">
+    <Heading class="card__title">
+      <a href={productUrl(product)}>{product.name}</a>
+    </Heading>
+    <p class="card__text">{product.tagline}</p>
+    <span class="card__more" aria-hidden="true">Ver ficha <Icon name="arrow" size={16} /></span>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--c-white);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition:
+      box-shadow 0.2s var(--ease),
+      border-color 0.2s var(--ease);
+  }
+  .card:hover {
+    border-color: var(--c-line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .card:focus-within {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 2px;
+  }
+  .card__media {
+    aspect-ratio: 16 / 9;
+    background: var(--c-surface);
+    overflow: hidden;
+  }
+  .card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--ease);
+  }
+  .card:hover .card__media img {
+    transform: scale(1.03);
+  }
+  .card__body {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-5);
+    flex: 1;
+    align-content: start;
+  }
+  .card__title {
+    font-size: var(--fs-lg);
+    letter-spacing: -0.01em;
+  }
+  .card__title a {
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .card__title a::after {
+    /* Toda la tarjeta es clicable con un único enlace */
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .card__title a:focus-visible {
+    outline: none;
+  }
+  .card__text {
+    color: var(--c-ink-soft);
+    font-size: var(--fs-sm);
+  }
+  .card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--c-blue);
+  }
+  .card__more :global(svg) {
+    transition: transform 0.18s var(--ease);
+  }
+  .card:hover .card__more :global(svg) {
+    transform: translateX(3px);
+  }
+</style>

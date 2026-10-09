@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import { primaryPhone } from '../../data/site';
+---
+
+<Base title="Solicitud enviada" description="Hemos recibido su solicitud de presupuesto." noindex>
+  <PageHero
+    title="Solicitud enviada"
+    eyebrow="Gracias"
+    lead="Hemos recibido su mensaje y nos pondremos en contacto con usted lo antes posible."
+  >
+    <p>Si es urgente, llámenos al <a href={primaryPhone.href}>{primaryPhone.display}</a>.</p>
+    <p><a class="btn btn--ghost" href="/">Volver al inicio</a></p>
+  </PageHero>
+</Base>

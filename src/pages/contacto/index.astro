@@ -1,0 +1,195 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import MapEmbed from '../../components/MapEmbed.astro';
+import Icon from '../../components/Icon.astro';
+import { site, fullAddress } from '../../data/site';
+import { localBusiness } from '../../data/schema';
+
+const breadcrumbs = [
+  { name: 'Inicio', href: '/' },
+  { name: 'Contacto', href: '/contacto/' },
+];
+---
+
+<Base
+  title="Contacto y presupuesto sin compromiso"
+  description="Pida presupuesto sin compromiso a Talleres Verjano: 91 303 87 75, info@talleresverjano.com. Exposición y fábrica en C/ Cerámica 25, P.I. La Cerámica, 28038 Madrid."
+  breadcrumbs={breadcrumbs}
+  jsonLd={[localBusiness]}
+>
+  <PageHero
+    title="Contacto"
+    eyebrow="Hablemos"
+    lead="Llámenos, escríbanos o visite nuestra exposición y fábrica. Si nos cuenta qué necesita, le preparamos un presupuesto sin compromiso."
+    breadcrumbs={breadcrumbs}
+  />
+
+  <section class="section" aria-label="Datos y formulario de contacto">
+    <div class="container contact">
+      <div class="contact__data">
+        <h2>Datos de contacto</h2>
+        <dl class="data">
+          <div>
+            <dt><Icon name="pin" size={20} /> {site.address.label}</dt>
+            <dd>
+              {site.address.street}<br />
+              {site.address.area}<br />
+              {site.address.postalCode} {site.address.city} ({site.address.district})<br />
+              <a href={site.mapsUrl} target="_blank" rel="noopener">Cómo llegar<span class="visually-hidden"> (Google Maps, pestaña nueva)</span></a>
+            </dd>
+          </div>
+          <div>
+            <dt><Icon name="phone" size={20} /> Teléfonos</dt>
+            <dd>
+              {
+                site.phones.map((p) => (
+                  <a class="data__big" href={p.href}>
+                    {p.display} <span class="data__label">{p.label}</span>
+                  </a>
+                ))
+              }
+            </dd>
+          </div>
+          <div>
+            <dt><Icon name="mail" size={20} /> Correo electrónico</dt>
+            <dd>
+              {
+                site.emails.map((e) => (
+                  <span class="data__line">
+                    <a href={`mailto:${e.address}`}>{e.address}</a>
+                    <span class="data__label">{e.label}</span>
+                  </span>
+                ))
+              }
+            </dd>
+          </div>
+          <div>
+            <dt><Icon name="clock" size={20} /> Horario</dt>
+            <dd>
+              {site.hours.lines[0]}<br />
+              {site.hours.lines[1]}
+              {!site.hours.confirmed && <span class="data__note">{site.hours.note}</span>}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="contact__form" id="presupuesto">
+        <h2>Solicite presupuesto sin compromiso</h2>
+        <p class="contact__intro">Responderemos a la mayor brevedad por teléfono o por correo, según prefiera.</p>
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--surface" aria-labelledby="mapa-title">
+    <div class="container">
+      <h2 id="mapa-title" class="map-title">Cómo llegar</h2>
+      <p class="map-sub">{fullAddress} ({site.address.district}).</p>
+      <MapEmbed />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  h2 {
+    font-size: var(--fs-xl);
+  }
+  .contact__data {
+    display: grid;
+    gap: var(--s-5);
+  }
+  .data {
+    margin: 0;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .data > div {
+    display: grid;
+    gap: var(--s-2);
+    padding-bottom: var(--s-5);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .data dt {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-weight: 750;
+  }
+  .data dt :global(svg) {
+    color: var(--c-brand);
+  }
+  .data dd {
+    margin: 0 0 0 1.75rem;
+    color: var(--c-ink-soft);
+  }
+  .data__big {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .data__big:hover {
+    color: var(--c-blue);
+  }
+  .data__line {
+    display: grid;
+    margin-bottom: var(--s-2);
+  }
+  .data__line a {
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+  .data__label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-muted);
+  }
+  .data__note {
+    display: block;
+    margin-top: var(--s-2);
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+  .contact__form {
+    display: grid;
+    gap: var(--s-3);
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border: 1px solid var(--c-line);
+    border-top: 4px solid var(--c-brand);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+    box-shadow: var(--shadow-sm);
+    scroll-margin-top: calc(var(--header-h) + 3.5rem);
+  }
+  .contact__intro {
+    color: var(--c-ink-soft);
+    margin-bottom: var(--s-3);
+  }
+  .map-title {
+    margin-bottom: var(--s-2);
+  }
+  .map-sub {
+    color: var(--c-ink-soft);
+    margin-bottom: var(--s-5);
+  }
+  @media (max-width: 62rem) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+    .contact__form {
+      order: -1;
+    }
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+import Icon from './Icon.astro';
+import type { TechDocument } from '../data/catalog';
+
+interface Props {
+  documents: TechDocument[];
+}
+
+const { documents } = Astro.props;
+---
+
+<section class="docs" aria-labelledby="docs-title">
+  <h2 id="docs-title">Documentación técnica</h2>
+  <p class="docs__note">Catálogos y fichas del fabricante en PDF.</p>
+  <ul>
+    {
+      documents.map((d) => (
+        <li>
+          <a href={d.href} target="_blank" rel="noopener" type="application/pdf">
+            <Icon name="file" size={20} />
+            <span>
+              {d.label}
+              <span class="visually-hidden"> (PDF, se abre en una pestaña nueva)</span>
+            </span>
+            <span class="docs__type" aria-hidden="true">PDF</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .docs {
+    display: grid;
+    gap: var(--s-3);
+  }
+  h2 {
+    font-size: var(--fs-lg);
+  }
+  .docs__note {
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+  ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s-2);
+  }
+  a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    padding: 0.7rem var(--s-4);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    background: var(--c-white);
+    color: var(--c-ink);
+    font-weight: 650;
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    transition: border-color 0.15s var(--ease);
+  }
+  a:hover {
+    border-color: var(--c-blue);
+    color: var(--c-blue);
+  }
+  a :global(svg) {
+    color: var(--c-brand);
+  }
+  .docs__type {
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--c-muted);
+  }
+</style>

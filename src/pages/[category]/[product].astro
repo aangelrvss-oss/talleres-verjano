@@ -1,0 +1,258 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import Sections from '../../components/Sections.astro';
+import SeriesTable from '../../components/SeriesTable.astro';
+import DocumentList from '../../components/DocumentList.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { products, getCategory, getProduct, productUrl, categoryUrl, type Product } from '../../data/catalog';
+import { primaryPhone } from '../../data/site';
+
+export function getStaticPaths() {
+  return products.map((product) => ({
+    params: { category: product.category, product: product.slug },
+    props: { product },
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const category = getCategory(product.category);
+const related = product.related.map((s) => getProduct(s)).filter((p): p is Product => Boolean(p));
+const quoteHref = `/contacto/?producto=${product.slug}#presupuesto`;
+
+const breadcrumbs = [
+  { name: 'Inicio', href: '/' },
+  { name: category.name, href: categoryUrl(category.slug) },
+  { name: product.name, href: productUrl(product) },
+];
+
+const webPage = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: product.name,
+  description: product.metaDescription,
+  about: { '@type': 'Thing', name: product.name },
+  provider: { '@id': `${(import.meta.env.SITE ?? '').replace(/\/$/, '')}/#empresa` },
+};
+---
+
+<Base title={product.metaTitle} description={product.metaDescription} ogImage={product.image} breadcrumbs={breadcrumbs} jsonLd={[webPage]}>
+  <PageHero title={product.name} eyebrow={category.name} lead={product.intro} breadcrumbs={breadcrumbs} />
+
+  <div class="section">
+    <div class="container product">
+      <article class="product__main">
+        <figure class="product__figure">
+          <Image
+            src={product.image}
+            alt={product.imageAlt}
+            widths={[480, 765]}
+            sizes="(max-width: 62rem) 100vw, 760px"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <figcaption>Imagen ilustrativa del producto.</figcaption>
+        </figure>
+
+        <p class="product__tagline">{product.tagline}</p>
+
+        <ul class="product__highlights" aria-label="Características principales">
+          {
+            product.highlights.map((h) => (
+              <li>
+                <Icon name="check" size={18} />
+                {h}
+              </li>
+            ))
+          }
+        </ul>
+
+        <Sections sections={product.sections} />
+
+        {
+          product.series && (
+            <div class="product__series">
+              <SeriesTable series={product.series} />
+            </div>
+          )
+        }
+      </article>
+
+      <aside class="product__aside" aria-label="Presupuesto y documentación">
+        <div class="quote-card">
+          <p class="quote-card__title">¿Le interesa {product.name.toLowerCase()}?</p>
+          <p>Cuéntenos medidas y necesidades y le preparamos un presupuesto sin compromiso.</p>
+          <a class="btn btn--primary" href={quoteHref}>Pedir presupuesto</a>
+          <a class="btn btn--ghost" href={primaryPhone.href}>
+            <Icon name="phone" size={18} />
+            {primaryPhone.display}
+          </a>
+        </div>
+
+        {product.documents && <DocumentList documents={product.documents} />}
+
+        {
+          product.brands && (
+            <div class="brands-box">
+              <p class="brands-box__title">Fabricantes</p>
+              <ul>
+                {product.brands.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </div>
+
+  {
+    related.length > 0 && (
+      <section class="section section--surface" aria-labelledby="relacionados-title">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Complementos</p>
+            <h2 id="relacionados-title">Productos relacionados</h2>
+          </div>
+          <div class="grid grid--4">
+            {related.map((p) => (
+              <ProductCard product={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <CtaBand />
+</Base>
+
+<style>
+  .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .product__main {
+    display: grid;
+    gap: var(--s-6);
+    min-width: 0;
+  }
+  .product__figure {
+    margin: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .product__figure img {
+    width: 100%;
+    aspect-ratio: 765 / 374;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+  .product__figure figcaption {
+    font-size: var(--fs-xs);
+    color: var(--c-muted);
+  }
+  .product__tagline {
+    font-size: var(--fs-2xl);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--c-ink);
+    padding-left: var(--s-5);
+    border-left: 4px solid var(--c-brand);
+  }
+  .product__highlights {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+  .product__highlights li {
+    display: flex;
+    gap: var(--s-2);
+    align-items: flex-start;
+    padding: var(--s-3) var(--s-4);
+    background: var(--c-surface);
+    border-radius: var(--radius);
+    font-weight: 650;
+    font-size: var(--fs-sm);
+  }
+  .product__highlights :global(svg) {
+    flex: none;
+    margin-top: 0.15rem;
+    color: var(--c-success);
+  }
+  .product__series {
+    margin-top: var(--s-2);
+  }
+
+  .product__aside {
+    display: grid;
+    gap: var(--s-6);
+  }
+  .quote-card {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    background: var(--c-ink);
+    color: #c9d2dc;
+    border-radius: var(--radius-lg);
+    font-size: var(--fs-sm);
+  }
+  .quote-card__title {
+    color: var(--c-white);
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .quote-card .btn--ghost {
+    --btn-fg: var(--c-white);
+    --btn-border: rgb(255 255 255 / 0.4);
+  }
+  .quote-card .btn--ghost:hover {
+    background: rgb(255 255 255 / 0.08);
+    --btn-border: var(--c-white);
+  }
+  .brands-box {
+    display: grid;
+    gap: var(--s-2);
+    font-size: var(--fs-sm);
+  }
+  .brands-box__title {
+    font-weight: 750;
+  }
+  .brands-box ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .brands-box li {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 999px;
+    font-weight: 650;
+    color: var(--c-ink-soft);
+  }
+
+  @media (max-width: 62rem) {
+    .product {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 34rem) {
+    .product__highlights {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
