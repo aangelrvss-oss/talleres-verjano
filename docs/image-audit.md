@@ -53,19 +53,22 @@ Todas proceden de la web actual (`ft_cab_cuerpo.jpg`), miden **765 × 374 px** (
 
 Autorizado en el encargo de la v3. Modelo `gpt_image_2_5` (variante *flare*), calidad alta, 2k (2048 × 1360, 3:2), sin texto, logotipos ni marcas de agua en el *prompt*. Coste: 2,75 créditos por imagen, **13,75 créditos** en total (5 imágenes), del saldo existente de 73,7. No se ha comprado nada.
 
-| Archivo de destino | Uso previsto | Escena | ID del trabajo |
-|---|---|---|---|
-| `hero-salon-corredera.jpg` | Hero de la portada | Salón luminoso en Madrid con corredera de aluminio gris antracita abierta a una terraza con olivo | `fd76e3e1-4498-4215-93f3-34ab3ad48010` |
-| `categoria-sistemas-aluminio.jpg` | Tarjeta principal y cabecera de «Sistemas en aluminio» | Salón con grandes correderas negras abiertas a una terraza mediterránea | `ab73ed3b-9ba3-4f1d-abd5-f9369a8aee46` |
-| `ficha-abatibles.jpg` | Cabecera de la ficha de abatibles (sustituye la foto dudosa) | Fachada de ladrillo con ventanas abatibles de aluminio antracita, una abierta | `3714ab50-8614-4729-a596-bea39d67d853` |
-| `categoria-materiales-adicionales.jpg` | Tarjeta y cabecera de «Materiales adicionales» | Detalle de ventana de aluminio con doble acristalamiento y persiana a media altura | `841a3ca5-1dc3-41f6-957e-88ccfcb12842` |
-| `categoria-otros-productos.jpg` | Tarjeta y cabecera de «Otros productos» | Terraza con pérgola de lamas de aluminio y toldo | `d8d15370-f85b-42b6-8a79-8171c9f8acd4` |
+Inventario real comprobado en la cuenta de Higgsfield el 9/10/2026 (consulta del historial, sin coste). Hay **6 imágenes distintas** para los 6 destinos: 5 generadas en la v3 y 1 generada antes por el propietario.
 
-El propietario aportó además, en la conversación, otras imágenes generadas anteriormente (1168 × 880): una fachada blanca con corredera, un salón con corredera negra abierta a un jardín (propuesta para `ficha-correderas.jpg`) y un detalle de manilla.
+| Archivo de destino | Uso previsto | Escena | ID del trabajo | Original |
+|---|---|---|---|---|
+| `hero-salon-corredera.jpg` | Hero de la portada | Salón luminoso en Madrid con corredera de aluminio gris antracita abierta a una terraza con olivo | `fd76e3e1-4498-4215-93f3-34ab3ad48010` | 2048 × 1360, calidad alta |
+| `categoria-sistemas-aluminio.jpg` | Tarjeta principal y cabecera de «Sistemas en aluminio» | Interior mediterráneo con grandes correderas negras abiertas a una terraza | `ab73ed3b-9ba3-4f1d-abd5-f9369a8aee46` | 2048 × 1360, calidad alta |
+| `categoria-materiales-adicionales.jpg` | Tarjeta y cabecera de «Materiales adicionales» | Detalle de ventana de aluminio con doble acristalamiento y persiana a media altura | `841a3ca5-1dc3-41f6-957e-88ccfcb12842` | 2048 × 1360, calidad alta |
+| `categoria-otros-productos.jpg` | Tarjeta y cabecera de «Otros productos» | Terraza con pérgola de lamas de aluminio y toldo | `d8d15370-f85b-42b6-8a79-8171c9f8acd4` | 2048 × 1360, calidad alta |
+| `ficha-abatibles.jpg` | Cabecera de la ficha de abatibles (sustituye la foto dudosa) | Fachada de ladrillo con ventanas abatibles de aluminio antracita, una abierta | `3714ab50-8614-4729-a596-bea39d67d853` | 2048 × 1360, calidad alta |
+| `ficha-correderas.jpg` | Cabecera de la ficha de correderas | Salón con corredera de aluminio antracita abierta a un jardín | `918413d9-02ec-44f9-9d21-1a26c30d47d3` (generada por el propietario el 20/9/2026) | 1168 × 880, **calidad baja**: revisar nitidez antes de usarla |
+
+En la cuenta hay otras dos imágenes del 20/9 que **no se usan**: una fachada blanca con corredera (`6b485d78…`) y un detalle de manilla (`f1c35335…`), ambas de 1168 × 880 y calidad baja. Pueden servir más adelante para una guía o para «La empresa».
 
 **Revisión visual** (sobre las vistas previas): perfiles de aluminio bien definidos y reconocibles como aluminio (antracita o negro, perfiles finos, sin aspecto de PVC), luz natural, sin personas, sin texto ni logotipos visibles. Las escenas son genéricas: **no muestran instalaciones reales de Talleres Verjano** y se rotulan «Imagen ilustrativa generada con IA».
 
-**Estado: generadas, pero todavía no incorporadas al repositorio.** El dominio de descarga de Higgsfield (`d8j0ntlcm91z4.cloudfront.net`) está bloqueado por la política de red del entorno de desarrollo y las imágenes que se pegaron en la conversación no llegan como archivo. La web publica hoy las imágenes de reserva. Para activarlas, ver §3.
+**Estado (v3.1): generadas, pero todavía no incorporadas al repositorio.** El dominio de descarga de Higgsfield (`d8j0ntlcm91z4.cloudfront.net`) sigue bloqueado por la política de red del entorno de desarrollo y las imágenes que se pegaron en la conversación no llegan como archivo. No se han vuelto a generar. La web publica hoy las imágenes de reserva, que cumplen su función. Para activarlas, ver §3.
 
 ### Prompts
 
@@ -79,12 +82,17 @@ Todos terminan con: *«No people, no text, no letters, no logos, no watermarks, 
 
 ## 3. Cómo incorporar las imágenes generadas
 
-1. Descargar cada imagen desde la cuenta de Higgsfield (o habilitar `d8j0ntlcm91z4.cloudfront.net` en la red del entorno).
-2. Convertirla a JPEG de calidad alta **sin cambiar su tamaño** (no ampliar) y guardarla en `src/assets/generated/` con el nombre de la tabla del §2.
-3. `npm run build`. `src/data/media.ts` detecta el archivo y lo usa con su texto alternativo, su punto de enfoque y el rótulo «Imagen ilustrativa generada con IA». Sin el archivo, se mantiene la imagen de reserva.
-4. Revisar el recorte en 320, 390, 1024 y 1440 px y ajustar `focus` en `media.ts` si hace falta.
+1. Descargar cada imagen original (PNG) desde la cuenta de Higgsfield: abrir la generación por su ID (tabla del §2) y usar «Descargar». Alternativa: habilitar `d8j0ntlcm91z4.cloudfront.net` en la red del entorno de desarrollo.
+2. Incorporarla con el nombre de destino:
+   ```bash
+   npm run add-image -- ~/Descargas/hf_…_fd76e3e1….png hero-salon-corredera
+   ```
+   El script (`scripts/add-generated-image.mjs`) solo acepta los 6 nombres previstos, convierte a JPEG de calidad alta **sin cambiar el tamaño** (nunca amplía), elimina los metadatos y avisa si la imagen es pequeña para su uso. Se admiten también archivos ya en JPEG, PNG o WebP copiados a mano: `src/data/media.ts` busca el nombre con cualquiera de esas extensiones.
+3. `npm run build`. `src/data/media.ts` detecta el archivo y lo usa con su texto alternativo, su punto de enfoque y el rótulo «Imagen ilustrativa generada con IA». Sin el archivo, se mantiene la imagen de reserva. En la web publicada se sirven en AVIF/WebP con `srcset` (la optimización la hace Astro en la compilación).
+4. Revisar el recorte en 320, 390, 1024 y 1440 px y ajustar `focus` en `media.ts` si hace falta. Repetir Lighthouse en la portada (la imagen del hero es la de mayor peso).
+5. Actualizar la columna «Estado» de `image-credits.md`.
 
-Se ha probado el mecanismo con un archivo temporal: la portada pasó a usar la imagen y el texto alternativo nuevos, y al retirarlo volvió a la de reserva.
+El mecanismo se ha probado con un archivo temporal (PNG convertido por el script): la portada pasó a usar la imagen y el texto alternativo nuevos, y al retirarlo volvió a la de reserva.
 
 ## 4. Vídeo de ambiente
 
@@ -103,7 +111,8 @@ Conclusión: el vídeo no es claramente mejor que la imagen fija y penaliza peso
 ## 5. Recomendaciones
 
 1. Activar las imágenes generadas (§3) en cuanto se puedan descargar.
-2. Sustituir la foto de abatibles (material no identificable) y la de mosquiteras (no se ve la mosquitera).
-3. A medio plazo, **fotografía propia** de trabajos reales (con permiso de los clientes): es lo único que resolverá la falta de coherencia de las fotos de producto y aportará prueba de trabajo real.
-4. Confirmar los derechos de uso de las 15 fotos de producto.
-5. Descargar los originales de Unsplash (ver `image-credits.md`).
+2. **Abatibles**: la sustituye `ficha-abatibles.jpg` al incorporarla. Hasta entonces se mantiene la foto actual.
+3. **Mosquiteras**: no hay ningún recurso adecuado (ni generado ni de stock revisado). Se mantiene temporalmente la foto actual; conviene una foto del fabricante o propia en la que se vea la mosquitera. No se ha generado otra para no gastar créditos sin aprobación.
+4. A medio plazo, **fotografía propia** de trabajos reales (con permiso de los clientes): es lo único que resolverá la falta de coherencia de las fotos de producto y aportará prueba de trabajo real.
+5. Confirmar los derechos de uso de las 15 fotos de producto.
+6. Descargar los originales de Unsplash (ver `image-credits.md`).

@@ -194,14 +194,32 @@ test.describe('Movimiento y accesibilidad', () => {
     await ctx.close();
   });
 
-  test('barra de contacto móvil: aparece al desplazarse y se oculta junto al formulario', async ({ page }) => {
+  test('barra de contacto móvil: se aparta al leer, vuelve al subir y se oculta junto al formulario', async ({ page }) => {
     test.skip((page.viewportSize()?.width ?? 1366) >= 768, 'Solo móvil');
     await page.goto('/');
     const bar = page.getByRole('region', { name: 'Contacto rápido' });
     await expect(bar).toBeHidden();
-    await page.evaluate(() => window.scrollTo(0, 1200));
+    // Desplaza y espera a que la barra procese el movimiento (2 fotogramas)
+    const scrollTo = (y: number) =>
+      page.evaluate((y) => {
+        window.scrollTo(0, y);
+        return new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      }, y);
+    // Leyendo hacia abajo no tapa el contenido
+    await scrollTo(1200);
+    await expect(bar).toBeHidden();
+    // Al subir un poco vuelve a estar a mano
+    await scrollTo(1000);
     await expect(bar).toBeVisible();
     await expect(bar.getByRole('link', { name: 'Llamar' })).toHaveAttribute('href', 'tel:+34913038775');
+    // Al final de la página se muestra y el pie reserva su altura
+    await scrollTo(await page.evaluate(() => document.documentElement.scrollHeight));
+    await expect(bar).toBeVisible();
+    const [barTop, lastLinkBottom] = await page.evaluate(() => {
+      const links = [...document.querySelectorAll('footer a')];
+      return [document.querySelector('[data-mbar]')!.getBoundingClientRect().top, links[links.length - 1].getBoundingClientRect().bottom];
+    });
+    expect(lastLinkBottom).toBeLessThanOrEqual(barTop);
     await page.goto('/contacto/#presupuesto');
     await page.locator('#presupuesto').scrollIntoViewIfNeeded();
     await expect(bar).toBeHidden();

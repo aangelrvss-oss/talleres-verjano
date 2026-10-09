@@ -119,3 +119,10 @@ El sitio publicado no carga ninguna librería de terceros en el navegador.
 - **Comprobación de datos comerciales**: `scripts/check-site.mjs` falla si una página muestra un porcentaje de ahorro (`UNVERIFIED_CLAIM`). Los datos técnicos que se mantienen se han contrastado con los PDF de QSystems (`content-inventory.md` §4).
 - **Tokens de movimiento** (`--dur-ui`, `--dur-panel`, `--dur`, `--stagger`) en lugar de duraciones sueltas. Sin librerías nuevas.
 - **Pruebas nuevas** (Playwright, «Contenido v3»): imagen principal prioritaria, cifras técnicas con su serie, 3 tarjetas de catálogo enlazadas, tabla de series sin desbordar a 375 px y PDF en pestaña nueva.
+
+## 13. Cierre v3.1
+
+- **Barra de contacto móvil**: se oculta al desplazarse hacia abajo (umbral de 8 px) y vuelve al subir o cerca del final de la página. Se descartó eliminarla: es el acceso a la conversión en móvil. Se descartó reducirla a solo iconos: el texto «Pedir presupuesto» es más claro.
+- **Imágenes generadas**: `scripts/add-generated-image.mjs` (`npm run add-image`) usa sharp, que ya instala Astro, para convertir sin ampliar y sin metadatos. `media.ts` acepta .jpg, .jpeg, .png o .webp con el nombre previsto.
+- **Prueba del formulario**: `scripts/test-form.sh` ejecuta 9 casos que no envían correo contra cualquier servidor y, solo con `--send`, un envío real. Probado contra Apache local en modo de prueba (10/10). `public/api/config.php` pasa a `.gitignore`.
+- **Unidades**: `src/utils/text.ts` (`nbUnits`) une número y unidad en tablas y especificaciones.

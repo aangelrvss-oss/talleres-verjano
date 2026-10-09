@@ -1,8 +1,63 @@
 # Informe de QA
 
-Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v3 (refinamiento visual, imágenes y conversión)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
+Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v3.1 (cierre y preparación para publicación)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
 
 Solo se recogen pruebas **realmente ejecutadas**. Limitaciones al final.
+
+## 0. Preparación para publicación (v3.1)
+
+Ejecutado el 9/10/2026 sobre la rama `claude/busy-gauss-k22go8` (punto de partida `7266c80`, sin cambios posteriores en el remoto).
+
+| Prueba | Resultado |
+|---|---|
+| `npm test` (astro check + build + check-site + Playwright contra `astro preview`) | 0 errores · 27 páginas, 25 URL en el sitemap, 24 redirecciones · comprobaciones superadas · **106 superadas**, 8 omitidas |
+| Playwright contra Apache + PHP 8.3 real | **103 superadas**, 11 omitidas |
+| Barra móvil (prueba nueva), repetida 20 veces (15 contra Apache, 5 contra preview) | 20/20 |
+| `scripts/test-form.sh http://localhost:8099 --send` (Apache local en modo de prueba: no envía correo) | **10/10**. Los descartes antispam no generan mensaje (1 entrada en el registro, la del envío válido) |
+| Redirecciones (curl, Apache) | 24/24: 301 → 200 en un salto; URL inexistente → 404 |
+| Desbordamiento: 27 páginas × 7 anchos (320–1920) | 0 en 189 combinaciones; 0 errores de JavaScript |
+| Barra móvil a 320, 375, 390 y 768 px (portada, abatibles, muro cortina, contacto) | 54 px de alto en una sola línea (antes 60 px a 320 por partir el texto). Al final de la página no solapa el pie; con el formulario en pantalla o con errores de validación, oculta; a 768 px no se muestra |
+| Tabla de series con teclado (320 px) | Zona enfocable con anillo de 3 px; las flechas desplazan la tabla (abatibles 52 px, correderas 33 px) |
+| `php -l public/api/contacto.php` | Sin errores (PHP 8.3). Sin funciones de PHP 8: compatible con 7.4+. Requiere mbstring |
+
+**Lighthouse 12 (v3.1)**, rendimiento / accesibilidad / buenas prácticas / SEO (Apache local; medido con las imágenes de reserva, **hay que repetirlo tras incorporar las generadas**):
+
+| Página | Móvil | LCP | Escritorio | LCP | CLS | Peso (móvil / escr.) |
+|---|---|---|---|---|---|---|
+| `/` | 100 / 100 / 100 / 100 | 1,9 s | 100 / 100 / 100 / 100 | 0,4 s | 0 / 0,001 | 211 / 241 KiB |
+| `/sistemas-aluminio/` | 100 / 100 / 100 / 100 | 1,7 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 207 / 224 KiB |
+| `/sistemas-aluminio/abatibles/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 101 / 105 KiB |
+| `/contacto/` | 100 / 100 / 100 / 100 | 1,3 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 66 / 70 KiB |
+
+**Defectos encontrados y corregidos en la v3.1**
+
+1. La barra de contacto móvil tapaba la parte inferior de tablas y listas de documentos al leer. Ahora se aparta al desplazarse hacia abajo y vuelve al subir o al final.
+2. A 320 px, «Pedir presupuesto» se partía en dos líneas y la barra crecía a 60 px.
+3. Las etiquetas de los PDF de Q95 («informe de producto») y Q120 («informe de ensayo») no correspondían al documento: ambos son «catálogo de sistema» de QSystems.
+4. Las unidades podían quedar separadas del número («228,5 / mm») en las especificaciones.
+5. `public/api/config.php` (credenciales del formulario en el servidor) no estaba en `.gitignore`.
+6. La nueva prueba de la barra móvil fallaba de forma intermitente contra Apache por una carrera en la propia prueba (dos desplazamientos en el mismo fotograma); se espera a que el navegador procese cada desplazamiento.
+
+**Lo que no se ha probado (y por qué)**
+
+- **Envío real de correo**: no hay acceso al alojamiento de producción. Procedimiento en `README.md`, «Prueba controlada del formulario».
+- **PHP 7.4 real**: revisión estática y `php -l` con 8.3; no hay un PHP 7.4 en el entorno.
+- **Safari/iOS y lectores de pantalla**: solo Chromium (ver §6).
+- **Imágenes definitivas**: no están en el repositorio (`image-audit.md` §2–3).
+
+### Bloqueantes para publicar
+
+| Tipo | Elemento |
+|---|---|
+| **Bloquea** | Prueba del formulario en el alojamiento real (buzón, remitente, SPF/DKIM y un envío autorizado). Sin ella no se sabe si llegan las solicitudes |
+| **Bloquea** | Razón social y NIF en el aviso legal y revisión de `/privacidad/` (obligación legal para una web comercial con formulario) |
+| **Bloquea** | Copiar la carpeta `archivos/` del servidor actual junto a la web nueva (si no, los 18 PDF de las fichas dan 404) |
+| **Bloquea** | Copia de seguridad completa de la web actual antes de sustituirla |
+| Recomendado antes | Incorporar las 6 imágenes generadas y repetir Lighthouse en la portada |
+| Recomendado antes | Confirmar los derechos de las 15 fotos de producto (o sustituirlas) |
+| Recomendado antes | Revisión manual en Safari (iPhone) |
+| Puede esperar | Horario, antigüedad, WhatsApp, garantías: la web funciona sin ellos, ocultos hasta su confirmación |
+| Puede esperar | Fotografías propias, foto de mosquiteras, logo en vector, originales de Unsplash |
 
 ## 0. Resumen (v3)
 

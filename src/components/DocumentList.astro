@@ -9,8 +9,13 @@ interface Props {
 }
 
 const { documents, brand } = Astro.props;
-// «Q57» → «Serie Q57»; las etiquetas que ya describen el documento se dejan igual
-const title = (label: string) => (/^Q[\w+]+$/.test(label) ? `Serie ${label}` : label);
+// «Q57» → «Serie Q57» · «Catálogo del fabricante»; «E-100 estructural · ficha técnica» → nombre y tipo
+const parts = (label: string) => {
+  const [name, kind] = label.split(' · ');
+  const title = /^Q[\w+]+$/.test(name) ? `Serie ${name}` : name;
+  const type = kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Catálogo del fabricante';
+  return { title, type };
+};
 ---
 
 <section class="docs" aria-labelledby="docs-title">
@@ -29,8 +34,8 @@ const title = (label: string) => (/^Q[\w+]+$/.test(label) ? `Serie ${label}` : l
               <Icon name="file" size={20} />
             </span>
             <span class="docs__text">
-              <span class="docs__name">{title(d.label)}</span>
-              <span class="docs__meta">Catálogo técnico · PDF</span>
+              <span class="docs__name">{parts(d.label).title}</span>
+              <span class="docs__meta">{parts(d.label).type} · PDF</span>
               <span class="visually-hidden"> (se abre en una pestaña nueva)</span>
             </span>
             <Icon name="external" size={18} class="docs__go" />

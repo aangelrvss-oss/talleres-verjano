@@ -1,13 +1,12 @@
 ---
 import type { SeriesTable } from '../data/catalog';
+import { nbUnits } from '../utils/text';
 
 interface Props {
   series: SeriesTable;
 }
 
 const { series } = Astro.props;
-// Las unidades no se separan del número al partir líneas
-const nb = (c: string) => c.replace(/ (mm|kg)\b/g, '\u00a0$1');
 // Si alguna celda usa la abreviatura RPT, se explica debajo de la tabla
 const usesRpt = series.rows.some((r) => r.some((c) => /\bRPT\b/.test(c)));
 ---
@@ -32,7 +31,7 @@ const usesRpt = series.rows.some((r) => r.some((c) => /\bRPT\b/.test(c)));
                     {/\bRPT\b/.test(cell) ? (
                       <Fragment set:html={cell.replace(/\bRPT\b/, '<abbr title="Rotura de puente térmico">RPT</abbr>')} />
                     ) : (
-                      nb(cell)
+                      nbUnits(cell)
                     )}
                   </td>
                 ),

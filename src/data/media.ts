@@ -26,14 +26,20 @@ export interface EditorialImage {
 
 const generatedFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/generated/*.{jpg,jpeg,png,webp}', { eager: true });
 
-function pick(file: string, fallback: Omit<EditorialImage, 'generated'>, generated: Omit<EditorialImage, 'src' | 'generated'>): EditorialImage {
-  const mod = generatedFiles[`../assets/generated/${file}`];
+/** Busca `src/assets/generated/<nombre>` con cualquier extensión admitida (.jpg, .jpeg, .png, .webp). */
+const findGenerated = (name: string) => {
+  const key = Object.keys(generatedFiles).find((k) => k.replace(/^.*\//, '').replace(/\.(jpe?g|png|webp)$/, '') === name);
+  return key ? generatedFiles[key] : undefined;
+};
+
+function pick(name: string, fallback: Omit<EditorialImage, 'generated'>, generated: Omit<EditorialImage, 'src' | 'generated'>): EditorialImage {
+  const mod = findGenerated(name);
   if (mod) return { src: mod.default, ...generated, generated: true };
   return { ...fallback, generated: false };
 }
 
 export const heroImage = pick(
-  'hero-salon-corredera.jpg',
+  'hero-salon-corredera',
   {
     src: fachada,
     alt: 'Ventanas de aluminio proyectantes abiertas en una fachada, iluminadas por la luz cálida del interior',
@@ -47,17 +53,17 @@ export const heroImage = pick(
 
 export const categoryImages = {
   'sistemas-aluminio': pick(
-    'categoria-sistemas-aluminio.jpg',
+    'categoria-sistemas-aluminio',
     { src: patio, alt: '', focus: '35% 50%' },
     { alt: '', focus: '55% 50%' },
   ),
   'materiales-adicionales': pick(
-    'categoria-materiales-adicionales.jpg',
+    'categoria-materiales-adicionales',
     { src: vidrios, alt: '', focus: '50% 50%' },
     { alt: '', focus: '45% 50%' },
   ),
   'otros-productos': pick(
-    'categoria-otros-productos.jpg',
+    'categoria-otros-productos',
     { src: toldos, alt: '', focus: '50% 50%' },
     { alt: '', focus: '50% 55%' },
   ),
@@ -74,7 +80,7 @@ const productOverrides: Record<string, string> = {
 
 export function productImageOverride(slug: string): { src: ImageMetadata; alt: string } | undefined {
   const alt = productOverrides[slug];
-  const mod = alt ? generatedFiles[`../assets/generated/ficha-${slug}.jpg`] : undefined;
+  const mod = alt ? findGenerated(`ficha-${slug}`) : undefined;
   return mod ? { src: mod.default, alt } : undefined;
 }
 

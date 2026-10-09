@@ -176,3 +176,14 @@ Contrastados el 9/10/2026 con los catálogos PDF del fabricante enlazados desde 
 
 `npm run check` falla si alguna página vuelve a mostrar un porcentaje de ahorro (expresión `UNVERIFIED_CLAIM` en `scripts/check-site.mjs`).
 
+**Revisión v3.1**
+
+| Dato | Hallazgo | Decisión |
+|---|---|---|
+| Etiquetas de los PDF de correderas y elevables | La web decía «Q95 · informe de producto» y «Q120 · informe de ensayo». La portada de ambos PDF dice «catálogo de sistema» (QSystems) | Corregido: «Serie Q95» y «Serie Q120», «Catálogo del fabricante», igual que el resto de series. Las demás etiquetas coinciden con su archivo |
+| «Calidad y garantía» (valores de «La empresa», heredado de la web actual) | Sugiere una garantía cuyas condiciones no están confirmadas | Pasa a «Calidad en cada detalle», como en la portada, hasta que se confirmen las garantías |
+| Tipo de la serie Q95 («Serie europea» en la tabla) | El catálogo la presenta como «sistema corredera con rotura de puente térmico» | Sin cambios en la tabla, porque no se contradicen: «europea» describe el tipo de serie, no excluye la RPT. **Pendiente** de que el propietario confirme la descripción |
+| Búsqueda en la web compilada | 0 apariciones de «1968», «50 años», WhatsApp, financiación, NIF/CIF, marcas no confirmadas, horario en datos estructurados y porcentajes de ahorro | Correcto |
+
+La lista de confirmaciones que debe aportar el propietario está en `README.md` («Pendientes del propietario»).
+

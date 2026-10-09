@@ -13,7 +13,8 @@
     "check": "node scripts/check-site.mjs",
     "test:e2e": "playwright test",
     "test": "npm run typecheck && npm run build && npm run check && npm run test:e2e",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "add-image": "node scripts/add-generated-image.mjs"
   },
   "engines": {
     "node": ">=20"

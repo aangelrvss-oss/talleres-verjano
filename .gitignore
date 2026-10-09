@@ -7,3 +7,6 @@ playwright-report/
 .env.*
 !.env.example
 *.log
+
+# Configuración del formulario en el servidor (no versionar)
+public/api/config.php
