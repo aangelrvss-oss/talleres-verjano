@@ -2,25 +2,52 @@
 # Prueba controlada del formulario de presupuesto contra un servidor real.
 #
 #   scripts/test-form.sh https://staging.ejemplo.com          # 9 casos, NO envía correo
+#
+#   TV_TEST_AUTORIZADO_POR="Nombre de quien autoriza" \
+#   TV_TEST_DESTINATARIO="buzon-de-prueba@dominio" \
 #   scripts/test-form.sh https://staging.ejemplo.com --send   # además, 1 envío real
 #
 # Sin --send ningún caso llega a llamar a mail(): son errores de validación,
 # accesos denegados o envíos que el antispam descarta en silencio.
-# Con --send se envía UNA solicitud real, marcada como prueba, al buzón
-# configurado (TV_FORM_TO). Úsese solo con autorización del propietario.
+# Con --send se envía UNA solicitud real, marcada como prueba, al buzón que el
+# servidor tenga en TV_FORM_TO. Para evitar envíos accidentales, --send exige:
+#   - TV_TEST_AUTORIZADO_POR: persona que ha autorizado la prueba.
+#   - TV_TEST_DESTINATARIO: buzón de prueba confirmado. Quien ejecuta la prueba
+#     debe haber comprobado en el servidor que TV_FORM_TO es ese buzón (el
+#     script no puede leerlo desde fuera).
+#   - Una terminal interactiva y escribir ENVIAR. En modo no interactivo
+#     (CI, scripts, agentes) el envío se rechaza siempre.
 set -u
 BASE="${1:?Uso: scripts/test-form.sh <url-base> [--send]}"
 BASE="${BASE%/}"
 SEND="${2:-}"
 EP="$BASE/api/contacto.php"
 pass=0; fail=0
+
+if [ -n "$SEND" ] && [ "$SEND" != "--send" ]; then
+  echo "Opción desconocida: $SEND" >&2; exit 2
+fi
+if [ "$SEND" = "--send" ]; then
+  # Comprobaciones previas: si falta algo, no se hace ninguna petición.
+  if [ -z "${TV_TEST_AUTORIZADO_POR:-}" ] || [ -z "${TV_TEST_DESTINATARIO:-}" ]; then
+    echo "Envío real rechazado: defina TV_TEST_AUTORIZADO_POR y TV_TEST_DESTINATARIO (ver cabecera del script)." >&2; exit 2
+  fi
+  if [ ! -t 0 ]; then
+    echo "Envío real rechazado: requiere una terminal interactiva para confirmarlo." >&2; exit 2
+  fi
+  echo "Se enviará 1 correo REAL a través de $EP"
+  echo "  Destinatario confirmado (TV_FORM_TO del servidor): $TV_TEST_DESTINATARIO"
+  echo "  Autorizado por: $TV_TEST_AUTORIZADO_POR"
+  read -r -p "Escriba ENVIAR para continuar: " answer
+  if [ "$answer" != "ENVIAR" ]; then echo "Cancelado. No se ha enviado nada."; exit 2; fi
+fi
 now_ms() { echo $(( $(date +%s) * 1000 )); }
 check() { # nombre, condición (0 = ok), detalle
   if [ "$2" -eq 0 ]; then pass=$((pass+1)); echo "  OK    $1"; else fail=$((fail+1)); echo "  FALLO $1 — $3"; fi
 }
 req() { curl -sS -o /tmp/tvf.body -w '%{http_code}' "$@"; }
 OLD=$(( $(now_ms) - 10000 ))
-VALID=(--data-urlencode "nombre=Prueba técnica" --data-urlencode "telefono=600 000 000" --data-urlencode "email=prueba@example.com" --data-urlencode "producto=abatibles" --data-urlencode "mensaje=PRUEBA TÉCNICA DE LA WEB. Ignorar este mensaje." --data-urlencode "privacidad=1" --data-urlencode "t=$OLD")
+VALID=(--data-urlencode "nombre=Prueba técnica" --data-urlencode "telefono=600 000 000" --data-urlencode "email=prueba@example.com" --data-urlencode "producto=abatibles" --data-urlencode "mensaje=PRUEBA TÉCNICA DE LA WEB ($(date '+%d/%m/%Y %H:%M')), autorizada por ${TV_TEST_AUTORIZADO_POR:-—}. Ignorar este mensaje." --data-urlencode "privacidad=1" --data-urlencode "t=$OLD")
 
 echo "Formulario: $EP"
 c=$(req -X GET "$EP"); check "GET devuelve 405" $([ "$c" = 405 ]; echo $?) "HTTP $c"
@@ -37,7 +64,8 @@ if [ "$SEND" = "--send" ]; then
   echo "Envío real (una sola solicitud, marcada como PRUEBA TÉCNICA):"
   c=$(req "${VALID[@]}" -H 'Accept: application/json' "$EP")
   check "Envío válido: 200 y {\"ok\":true}" $([ "$c" = 200 ] && grep -q '"ok":true' /tmp/tvf.body; echo $?) "HTTP $c $(head -c 200 /tmp/tvf.body)"
-  echo "  → Compruebe que el correo ha llegado al buzón configurado (y no a spam), con Reply-To: prueba@example.com."
+  echo "  → Compruebe que el correo ha llegado a $TV_TEST_DESTINATARIO (y no a spam), con Reply-To: prueba@example.com."
+  echo "  → Anote fecha, hora y resultado en docs/launch-checklist.md (sección «Prueba del formulario»)."
 fi
 rm -f /tmp/tvf.body
 echo "Resultado: $pass correctos, $fail fallos"

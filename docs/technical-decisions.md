@@ -126,3 +126,11 @@ El sitio publicado no carga ninguna librería de terceros en el navegador.
 - **Imágenes generadas**: `scripts/add-generated-image.mjs` (`npm run add-image`) usa sharp, que ya instala Astro, para convertir sin ampliar y sin metadatos. `media.ts` acepta .jpg, .jpeg, .png o .webp con el nombre previsto.
 - **Prueba del formulario**: `scripts/test-form.sh` ejecuta 9 casos que no envían correo contra cualquier servidor y, solo con `--send`, un envío real. Probado contra Apache local en modo de prueba (10/10). `public/api/config.php` pasa a `.gitignore`.
 - **Unidades**: `src/utils/text.ts` (`nbUnits`) une número y unidad en tablas y especificaciones.
+
+## 14. Pre-lanzamiento
+
+- **Imágenes generadas**: incorporadas desde los originales aportados por el propietario (`archive.zip`), con el script de importación. Commit propio (`054dc0f`) para poder revertirlo sin afectar al resto.
+- **Rótulo de IA**: `Product.imageGenerated` y `EditorialImage.generated` deciden el pie de foto («generada con IA»); el pie de la web lo menciona cuando hay alguna.
+- **Envío real del formulario**: `scripts/test-form.sh --send` exige autorización con nombre, destinatario confirmado y confirmación interactiva; en modo no interactivo se rechaza siempre. Así no puede lanzarse desde CI ni por un agente.
+- **Verificación del despliegue**: `scripts/verify-deploy.sh` (solo lectura) saca páginas, redirecciones y PDF del propio proyecto (`dist/`, `docs/redirect-map.csv`), de modo que la lista no se desfasa.
+- **Lanzamiento**: preferible cambiar la carpeta raíz del dominio (reversible al instante) frente a sobrescribir; `DirectoryIndex index.html` evita que un `index.php` antiguo tome la portada. Procedimiento en `docs/launch-checklist.md`.

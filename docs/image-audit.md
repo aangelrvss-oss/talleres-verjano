@@ -68,7 +68,7 @@ En la cuenta hay otras dos imágenes del 20/9 que **no se usan**: una fachada bl
 
 **Revisión visual** (sobre las vistas previas): perfiles de aluminio bien definidos y reconocibles como aluminio (antracita o negro, perfiles finos, sin aspecto de PVC), luz natural, sin personas, sin texto ni logotipos visibles. Las escenas son genéricas: **no muestran instalaciones reales de Talleres Verjano** y se rotulan «Imagen ilustrativa generada con IA».
 
-**Estado (v3.1): generadas, pero todavía no incorporadas al repositorio.** El dominio de descarga de Higgsfield (`d8j0ntlcm91z4.cloudfront.net`) sigue bloqueado por la política de red del entorno de desarrollo y las imágenes que se pegaron en la conversación no llegan como archivo. No se han vuelto a generar. La web publica hoy las imágenes de reserva, que cumplen su función. Para activarlas, ver §3.
+**Estado (pre-lanzamiento): incorporadas.** El propietario aportó los originales en `archive.zip` (8 PNG y el vídeo). Se comprobó que los 6 necesarios coinciden con los ID de la tabla (nombre de archivo, tamaño y contenido), se revisó `918413d9` al 100 % y se incorporaron con `npm run add-image` (JPEG de alta calidad, sin ampliar, sin metadatos): 2,3 MB en el repositorio; la web los sirve en AVIF/WebP. No se regeneró ninguna imagen ni se gastaron créditos. Recorte revisado a 320, 390, 1024 y 1440 px. Commit `054dc0f`.
 
 ### Prompts
 
@@ -110,8 +110,8 @@ Conclusión: el vídeo no es claramente mejor que la imagen fija y penaliza peso
 
 ## 5. Recomendaciones
 
-1. Activar las imágenes generadas (§3) en cuanto se puedan descargar.
-2. **Abatibles**: la sustituye `ficha-abatibles.jpg` al incorporarla. Hasta entonces se mantiene la foto actual.
+1. ~~Activar las imágenes generadas~~: hecho (ver §2).
+2. **Abatibles**: sustituida por `ficha-abatibles.jpg` (fachada de ladrillo con ventanas abatibles de aluminio).
 3. **Mosquiteras**: no hay ningún recurso adecuado (ni generado ni de stock revisado). Se mantiene temporalmente la foto actual; conviene una foto del fabricante o propia en la que se vea la mosquitera. No se ha generado otra para no gastar créditos sin aprobación.
 4. A medio plazo, **fotografía propia** de trabajos reales (con permiso de los clientes): es lo único que resolverá la falta de coherencia de las fotos de producto y aportará prueba de trabajo real.
 5. Confirmar los derechos de uso de las 15 fotos de producto.

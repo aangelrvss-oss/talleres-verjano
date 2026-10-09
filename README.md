@@ -19,6 +19,7 @@ Nueva versión de [www.talleresverjano.com](https://www.talleresverjano.com/): s
 | [docs/technical-decisions.md](docs/technical-decisions.md) | Arquitectura y decisiones técnicas |
 | [docs/redirect-map.csv](docs/redirect-map.csv) | Mapa de redirecciones (fuente de `.htaccess` y `_redirects`) |
 | [docs/qa-report.md](docs/qa-report.md) | Pruebas ejecutadas y resultados |
+| [docs/launch-checklist.md](docs/launch-checklist.md) | Lanzamiento: bloqueantes, migración, restauración, prueba del formulario y checklist posterior |
 
 ## Requisitos
 
@@ -59,7 +60,7 @@ BASE_URL=http://localhost:8099 E2E_REAL_BACKEND=1 npx playwright test --workers=
 
 Playwright usa Chromium. En este entorno está preinstalado; en otro equipo: `npx playwright install chromium`.
 
-Prueba del formulario contra un servidor (sin enviar correo; con `--send`, un único envío real): `scripts/test-form.sh <url-base>`. Ver «Prueba controlada del formulario».
+Prueba del formulario contra un servidor (sin enviar correo): `scripts/test-form.sh <url-base>`. El envío real exige autorización expresa: ver `docs/launch-checklist.md` §3. Verificación de un despliegue (solo lectura): `scripts/verify-deploy.sh <url-base>`.
 
 ## Editar contenido
 
@@ -100,55 +101,11 @@ Requisitos del alojamiento para el formulario: **PHP 7.4 o superior** con la ext
 
 No hay claves, credenciales ni secretos en el código.
 
-## Despliegue sin afectar a la web actual
+## Despliegue
 
-El sitio compilado (`dist/`) son archivos estáticos más un script PHP. El destino recomendado es **el alojamiento actual** (Apache + PHP), que permite reutilizar el `.htaccess` generado y el formulario PHP sin coste adicional.
+El sitio compilado (`dist/`) son archivos estáticos más un script PHP, pensados para **el alojamiento actual** (Apache + PHP), sin cambios de DNS ni costes adicionales.
 
-### 1. Vista previa (staging)
-
-1. En el panel del alojamiento, cree un subdominio, por ejemplo `nueva.talleresverjano.com`, con su propia carpeta y certificado SSL.
-2. Compile la vista previa:
-   ```bash
-   STAGING=1 SITE_URL=https://nueva.talleresverjano.com npm run build
-   ```
-3. Suba el **contenido** de `dist/` (incluidos los archivos ocultos `.htaccess` y `api/.htaccess`) a la carpeta del subdominio.
-4. Copie también la carpeta `archivos/` del sitio actual, para que funcionen los PDF técnicos.
-5. Configure `TV_FORM_TO` con un buzón de pruebas y siga la **prueba controlada del formulario** (abajo).
-6. Revise la web. El subdominio no se indexa (`noindex` y `robots.txt`).
-
-### 2. Lanzamiento (requiere autorización del propietario)
-
-1. Haga una **copia de seguridad completa** de la carpeta pública actual (`httpdocs/` o equivalente).
-2. Compile la versión definitiva: `npm run build` (sin `STAGING`).
-3. Suba el contenido de `dist/` a la carpeta pública **conservando la carpeta `archivos/`**. Los antiguos `*.html`, `index.php`, `css/`, `js/` y `app/` pueden retirarse; sus URLs quedan cubiertas por las redirecciones 301.
-4. Compruebe:
-   - `/01aluminio_sistemas_abatibles.html` responde 301 → `/sistemas-aluminio/abatibles/`.
-   - `/una-url-inventada` responde 404.
-   - El formulario llega al buzón real (envíe un mensaje identificado como prueba y avise a la empresa).
-   - Un PDF de una ficha se abre correctamente.
-5. Si el certificado cubre `www` y el alojamiento no fuerza HTTPS, active el bloque comentado «Forzar HTTPS y www» del `.htaccess` (editándolo en `scripts/gen-redirects.mjs`).
-6. Envíe `https://www.talleresverjano.com/sitemap-index.xml` en Google Search Console y actualice el horario y la web en la ficha de Google Business Profile.
-
-**Vuelta atrás**: restaure la copia de seguridad del paso 1.
-
-### Prueba controlada del formulario
-
-Hasta ahora el formulario solo se ha probado en local (Apache + PHP 8.3 en modo de prueba, sin enviar correo). **El envío real no está validado.** Cuando haya acceso al alojamiento:
-
-1. Configure `TV_FORM_TO` (buzón de pruebas acordado con la empresa) y `TV_FORM_FROM` (un remitente del propio dominio). Compruebe que `TV_FORM_DRY_RUN` **no** está activo.
-2. Ejecute los casos que no envían correo:
-   ```bash
-   scripts/test-form.sh https://nueva.talleresverjano.com
-   ```
-   Comprueba el método (405), la validación del servidor (422 por campo), el antispam (campo trampa y tiempo mínimo), la respuesta sin JavaScript y que `config.php` y `.htaccess` no son accesibles.
-3. Con autorización del propietario, un único envío real identificado como prueba:
-   ```bash
-   scripts/test-form.sh https://nueva.talleresverjano.com --send
-   ```
-   Debe responder `{"ok":true}`. Compruebe en el buzón que el mensaje llega (y no a spam), con los datos completos y `Reply-To` del remitente.
-4. Desde el navegador: envíe el formulario con un producto preseleccionado (`/contacto/?producto=abatibles#presupuesto`) y compruebe que el mensaje de confirmación aparece **solo** tras la respuesta del servidor.
-5. Si `mail()` falla, la web muestra un error con el teléfono y el correo (nunca un éxito falso): revise el registro de errores de PHP (`[tv-form] mail() devolvió false`), SPF/DKIM del dominio y si el proveedor admite el parámetro `-f`.
-6. Límite: 5 envíos por IP y hora. Si se hacen varias pruebas desde la misma conexión, espere una hora o borre los archivos `tv-form-*` del directorio temporal del servidor.
+El procedimiento completo está en **[docs/launch-checklist.md](docs/launch-checklist.md)**: bloqueantes, copia de seguridad, vista previa en subdominio, lanzamiento, restauración, prueba del formulario (`scripts/test-form.sh`) y verificación posterior (`scripts/verify-deploy.sh`).
 
 ### Alternativa: Netlify o Cloudflare Pages (gratis)
 
@@ -162,16 +119,15 @@ Sirven `dist/` y usan `_redirects` (generado automáticamente), pero **no ejecut
 
 ## Pendientes del propietario
 
-Lista única de confirmaciones. Mientras no lleguen, los datos afectados están ocultos o retirados de la web; no se rellenan con suposiciones.
+Lista única de confirmaciones. Mientras no lleguen, los datos afectados están ocultos o retirados de la web; no se rellenan con suposiciones. Los datos legales mínimos y las autorizaciones del lanzamiento están detallados en `docs/launch-checklist.md` §2.
 
 1. **Horario definitivo**: la web actual y Google no coinciden (`docs/content-inventory.md` §1). Activar con `hours.confirmed`.
 2. **Antigüedad** que se quiere comunicar («desde 1968»): activar con `foundingYearConfirmed`.
-3. **Razón social y NIF** para el aviso legal, y revisión legal de `/privacidad/`.
+3. **Razón social, NIF, domicilio social y datos registrales** para el aviso legal (página aún inexistente: **bloquea el lanzamiento**) y para `/privacidad/`.
 4. **Garantías y condiciones comerciales**: garantía de las lonas de los toldos (5 años en la web actual), financiación sin intereses y cualquier otra condición que se quiera publicar.
 5. **WhatsApp**: si el móvil 635 30 40 43 lo admite y se quiere ofrecer. También redes sociales.
 6. **Derechos de uso de las imágenes**: las 15 fotos de producto de la web actual (probablemente de fabricantes; la de domótica y la de cerrajería muestran marcas), y el logotipo en vector. Ver `docs/image-credits.md`.
-7. **Archivos de las imágenes generadas** (6): ver `docs/image-audit.md` §3.
-8. **Formulario**: buzón que recibe las solicitudes y remitente del dominio (`TV_FORM_TO`, `TV_FORM_FROM`), SPF/DKIM y autorización para el envío de prueba.
-9. **Datos técnicos sin fuente**: porcentajes de ahorro (RPT 60 %, doble acristalamiento 50 %, Planitherm ATR 40/60 %). Solo se volverán a publicar con un documento del fabricante (`docs/content-inventory.md` §4).
-10. Confirmar o descartar marcas y servicios citados en la web actual: reformas integrales, PVC Kömmerling, Somfy, Mago y Persax.
-11. Descargar los originales de las 2 fotos de Unsplash (`docs/image-credits.md`).
+7. **Formulario**: buzón que recibe las solicitudes y remitente del dominio (`TV_FORM_TO`, `TV_FORM_FROM`), SPF/DKIM y autorización para el envío de prueba.
+8. **Datos técnicos sin fuente**: porcentajes de ahorro (RPT 60 %, doble acristalamiento 50 %, Planitherm ATR 40/60 %). Solo se volverán a publicar con un documento del fabricante (`docs/content-inventory.md` §4).
+9. Confirmar o descartar marcas y servicios citados en la web actual: reformas integrales, PVC Kömmerling, Somfy, Mago y Persax.
+10. Descargar los originales de las 2 fotos de Unsplash (`docs/image-credits.md`).

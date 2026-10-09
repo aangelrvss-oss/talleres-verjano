@@ -1,8 +1,37 @@
 # Informe de QA
 
-Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v3.1 (cierre y preparación para publicación)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
+Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **pre-lanzamiento** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
 
 Solo se recogen pruebas **realmente ejecutadas**. Limitaciones al final.
+
+## 00. Pre-lanzamiento (tras incorporar las imágenes)
+
+Ejecutado el 9/10/2026 sobre los commits `054dc0f` (imágenes) y el de documentación operativa. Medido con las **imágenes definitivas**.
+
+| Prueba | Resultado |
+|---|---|
+| `npm test` (astro check + build + check-site + Playwright contra preview) | 0 errores · 27 páginas · 24 redirecciones · **106 superadas**, 8 omitidas |
+| Playwright contra Apache + PHP 8.3 | **103 superadas**, 11 omitidas |
+| Desbordamiento: 27 páginas × 7 anchos | 0 en 189; 0 errores JS; 0 imágenes rotas |
+| `scripts/verify-deploy.sh` contra Apache local | 27 páginas y 24 redirecciones correctas. Fallos esperados en local: los 18 PDF (no existe `archivos/`) y el canonical (apunta a producción). Con marcadores en las rutas de los PDF y `SITE_URL` local: 75/75 |
+| `scripts/test-form.sh` sin `--send` | 9/9 (sin envío; registro de envíos vacío) |
+| `--send` sin autorización / sin terminal interactiva / opción desconocida | Rechazado las 3 veces antes de cualquier petición (0 peticiones en el registro de Apache). **El envío real no se ha ejecutado** |
+| Opción B del lanzamiento (archivos antiguos presentes) | Con un `index.php` y un `.html` antiguos en la raíz: se sirve la portada nueva y la URL antigua responde 301 |
+| Recorte de las imágenes nuevas a 320, 390, 1024 y 1440 px | Correcto. Corregido el contraste del contador de «Otros productos» |
+
+**Lighthouse 12** (rendimiento / accesibilidad / buenas prácticas / SEO):
+
+| Página | Móvil | LCP | Escritorio | LCP | Peso (móvil / escr.) |
+|---|---|---|---|---|---|
+| `/` | 100 / 100 / 100 / 100 | 1,9 s | 100 / 100 / 100 / 100 | 0,5 s | 225 / 284 KiB |
+| `/sistemas-aluminio/` | 98 / 100 / 100 / 100 | 2,4 s | 100 / 100 / 100 / 100 | 0,5 s | 281 / 299 KiB |
+| `/otros-productos/` | 99 / 100 / 100 / 100 | 2,3 s | 100 / 100 / 100 / 100 | 0,5 s | 238 / 283 KiB |
+| `/sistemas-aluminio/abatibles/` | 100 / 100 / 100 / 100 | 1,7 s | 100 / 100 / 100 / 100 | 0,4 s | 143 / 147 KiB |
+| `/sistemas-aluminio/correderas/` | 100 / 100 / 100 / 100 | 1,5 s | 100 / 100 / 100 / 100 | 0,4 s | 111 / 115 KiB |
+
+El LCP móvil de las cabeceras de categoría sube (de 1,7 a 2,3–2,4 s) porque las fotos nuevas tienen más detalle que las de 765 px; sigue por debajo de 2,5 s («bueno»). Repetir con PageSpeed Insights en el alojamiento real.
+
+No se ha podido comprobar desde el entorno de desarrollo: el envío real de correo, el DNS del dominio (SPF/DKIM/MX: consultas bloqueadas por la red), PHP 7.4 real, Safari/iOS y el alojamiento de producción. Procedimientos en `docs/launch-checklist.md`.
 
 ## 0. Preparación para publicación (v3.1)
 
@@ -47,17 +76,7 @@ Ejecutado el 9/10/2026 sobre la rama `claude/busy-gauss-k22go8` (punto de partid
 
 ### Bloqueantes para publicar
 
-| Tipo | Elemento |
-|---|---|
-| **Bloquea** | Prueba del formulario en el alojamiento real (buzón, remitente, SPF/DKIM y un envío autorizado). Sin ella no se sabe si llegan las solicitudes |
-| **Bloquea** | Razón social y NIF en el aviso legal y revisión de `/privacidad/` (obligación legal para una web comercial con formulario) |
-| **Bloquea** | Copiar la carpeta `archivos/` del servidor actual junto a la web nueva (si no, los 18 PDF de las fichas dan 404) |
-| **Bloquea** | Copia de seguridad completa de la web actual antes de sustituirla |
-| Recomendado antes | Incorporar las 6 imágenes generadas y repetir Lighthouse en la portada |
-| Recomendado antes | Confirmar los derechos de las 15 fotos de producto (o sustituirlas) |
-| Recomendado antes | Revisión manual en Safari (iPhone) |
-| Puede esperar | Horario, antigüedad, WhatsApp, garantías: la web funciona sin ellos, ocultos hasta su confirmación |
-| Puede esperar | Fotografías propias, foto de mosquiteras, logo en vector, originales de Unsplash |
+Actualizados en la fase de pre-lanzamiento: ver **`docs/launch-checklist.md` §1** (lista vigente). Las 6 imágenes generadas ya están incorporadas.
 
 ## 0. Resumen (v3)
 
