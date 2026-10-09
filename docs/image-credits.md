@@ -13,7 +13,7 @@
 
 **Imágenes problemáticas en fichas**:
 - **Abatibles**: resuelto con `ficha-abatibles.jpg` (generada con IA, rotulada).
-- **Mosquiteras**: no se ve ninguna mosquitera. No hay recurso adecuado; se mantiene temporalmente y queda documentada.
+- **Mosquiteras**: la foto sí muestra mosquiteras plisadas (revisada al 100 %), pero a tamaño de tarjeta se distinguen poco. Se mantiene; sustitución recomendada en `image-audit.md` §5. Texto alternativo corregido.
 
 ## Detalle
 

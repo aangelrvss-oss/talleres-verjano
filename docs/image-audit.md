@@ -30,7 +30,7 @@ Todas proceden de la web actual (`ft_cab_cuerpo.jpg`), miden **765 × 374 px** (
 | Vidrios y acristalamientos | Fachada de vidrio con cielo | Genérica | Aceptable como ilustración |
 | Persianas y compactos | Persianas de aluminio en una vivienda | Correcta | |
 | Domótica y automatismos | Mandos y motores | Correcta | Foto de producto de fabricante, con marca visible en los mandos |
-| Mosquiteras | Porche con correderas | **Débil** | No se ve ninguna mosquitera |
+| Mosquiteras | Porche cerrado con mosquiteras plisadas de gran formato | **Correcta, poco legible** | Revisada al 100 % (pre-lanzamiento): los paños son mosquiteras plisadas (se ven los pliegues), no puertas de vidrio. A tamaño de tarjeta no se distinguen. El texto alternativo decía «puertas acristaladas»: corregido |
 | Hierro y forja | Barrotes de forja | Correcta | |
 | Toldos y pérgolas | Toldo extendido | Correcta | |
 | Frentes de armario | Armario con puertas correderas | Correcta | |
@@ -112,7 +112,7 @@ Conclusión: el vídeo no es claramente mejor que la imagen fija y penaliza peso
 
 1. ~~Activar las imágenes generadas~~: hecho (ver §2).
 2. **Abatibles**: sustituida por `ficha-abatibles.jpg` (fachada de ladrillo con ventanas abatibles de aluminio).
-3. **Mosquiteras**: no hay ningún recurso adecuado (ni generado ni de stock revisado). Se mantiene temporalmente la foto actual; conviene una foto del fabricante o propia en la que se vea la mosquitera. No se ha generado otra para no gastar créditos sin aprobación.
+3. **Mosquiteras**: la foto actual es correcta pero no se aprecia el producto a tamaño de tarjeta. **Solución pendiente** (no bloquea): sustituirla por una foto en la que la malla se vea de cerca (detalle de una mosquitera enrollable o plisada en una ventana de aluminio), de al menos 1200 px de ancho, propia o del fabricante con permiso. Se incorpora reemplazando `src/assets/products/mosquiteras.png` (mismo nombre) y ajustando `imageAlt` en `catalog.ts`; el pie seguirá diciendo «Imagen ilustrativa del producto». Generar una con IA requeriría autorización y créditos: no se ha hecho.
 4. A medio plazo, **fotografía propia** de trabajos reales (con permiso de los clientes): es lo único que resolverá la falta de coherencia de las fotos de producto y aportará prueba de trabajo real.
 5. Confirmar los derechos de uso de las 15 fotos de producto.
 6. Descargar los originales de Unsplash (ver `image-credits.md`).

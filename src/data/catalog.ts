@@ -744,7 +744,7 @@ export const products: Product[] = [
     metaDescription:
       'Mosquiteras de aluminio enrollables verticales y laterales, fijas, correderas y plisadas, con red de fibra de vidrio y variedad de colores. Madrid.',
     image: imgMosquiteras,
-    imageAlt: 'Porche con grandes puertas acristaladas que dan a una piscina',
+    imageAlt: 'Porche cerrado con mosquiteras plisadas de gran formato, con vistas a una piscina',
     highlights: ['Enrollables, fijas, correderas y plisadas', 'Red de fibra de vidrio', 'Variedad de colores', 'Para ventanas y terrazas'],
     sections: [
       {

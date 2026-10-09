@@ -157,7 +157,7 @@ Después, en ambos casos: §6 completo; activar el bloque «Forzar HTTPS y www»
 | 6 imágenes generadas con Higgsfield (hero, 3 categorías, cabeceras de abatibles y correderas) | **Incorporadas** (commit `054dc0f`) desde los originales que aportó el propietario. Convertidas sin ampliar; rotuladas «Imagen ilustrativa generada con IA». No se ha regenerado ninguna ni se han gastado créditos en esta fase |
 | `ficha-correderas` | Original de 1168 × 880 y calidad baja de origen; revisada al 100 %: correcta al tamaño en que se muestra |
 | 15 fotos de producto de la web actual | En uso. **Derechos pendientes de confirmar** (2 llevan marca de fabricante) |
-| Foto de mosquiteras | Se mantiene, aunque no se ve la mosquitera. No hay sustituto adecuado |
+| Foto de mosquiteras | Correcta (mosquiteras plisadas, revisada al 100 %) pero poco legible a tamaño de tarjeta. Se mantiene; sustitución recomendada, no bloquea (`image-audit.md` §5). Texto alternativo corregido |
 | 2 fotos de Unsplash | Licencia verificada; conviene descargar los originales |
 | Vídeo de ambiente | Descartado para el hero (corte brusco, peso). No se incluye |
 
