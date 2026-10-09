@@ -1,4 +1,5 @@
 ---
+import { anyGenerated } from '../data/media';
 import Icon from './Icon.astro';
 import { categories, productsIn, productUrl, categoryUrl } from '../data/catalog';
 import { site, fullAddress } from '../data/site';
@@ -78,7 +79,7 @@ const year = new Date().getFullYear();
   <div class="footer__bottom">
     <div class="container footer__bottom-inner">
       <p>© {year} {site.name}. Todos los derechos reservados.</p>
-      <p>Las imágenes de producto son ilustrativas.</p>
+      <p>Las imágenes son ilustrativas{anyGenerated ? '; algunas están generadas con IA' : ''}. No muestran trabajos realizados.</p>
     </div>
   </div>
 </footer>

@@ -84,4 +84,5 @@ export function productImageOverride(slug: string): { src: ImageMetadata; alt: s
   return mod ? { src: mod.default, alt } : undefined;
 }
 
-export const anyGenerated = heroImage.generated || Object.values(categoryImages).some((i) => i.generated);
+export const anyGenerated =
+  heroImage.generated || Object.values(categoryImages).some((i) => i.generated) || Object.keys(productOverrides).some((slug) => productImageOverride(slug));

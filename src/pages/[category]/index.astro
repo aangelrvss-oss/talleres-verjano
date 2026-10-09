@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import CategorySwitch from '../../components/CategorySwitch.astro';
-import { categories, productsIn, categoryUrl, getCategoryImage, type Category } from '../../data/catalog';
+import { categories, productsIn, categoryUrl, getCategoryImage, getCategoryMedia, type Category } from '../../data/catalog';
 
 export function getStaticPaths() {
   return categories.map((category) => ({ params: { category: category.slug }, props: { category } }));
@@ -29,7 +29,7 @@ const breadcrumbs = [
     lead={category.intro}
     breadcrumbs={breadcrumbs}
     image={getCategoryImage(category.slug)}
-    imageCaption="Imagen ilustrativa."
+    imageCaption={getCategoryMedia(category.slug).generated ? 'Imagen ilustrativa generada con IA.' : 'Imagen ilustrativa.'}
   />
 
   <CategorySwitch current={category.slug} />

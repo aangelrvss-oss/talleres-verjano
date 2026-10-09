@@ -60,6 +60,8 @@ export interface Product {
   metaDescription: string;
   image: ImageMetadata;
   imageAlt: string;
+  /** true si la imagen es generada con IA (src/data/media.ts); se indica en el pie de foto. */
+  imageGenerated?: boolean;
   highlights: string[];
   sections: Section[];
   series?: SeriesTable;
@@ -1181,6 +1183,7 @@ for (const p of products) {
   if (o) {
     p.image = o.src;
     p.imageAlt = o.alt;
+    p.imageGenerated = true;
   }
 }
 

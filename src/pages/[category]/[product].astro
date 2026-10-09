@@ -60,7 +60,7 @@ const webPage = {
     breadcrumbs={breadcrumbs}
     image={product.image}
     imageAlt={product.imageAlt}
-    imageCaption="Imagen ilustrativa del producto."
+    imageCaption={product.imageGenerated ? 'Imagen ilustrativa generada con IA.' : 'Imagen ilustrativa del producto.'}
   >
     <div class="hero-actions">
       <a class="btn btn--primary btn--lg" href={quoteHref}>
