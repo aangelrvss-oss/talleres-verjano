@@ -43,7 +43,7 @@ export const guides: Guide[] = [
         blocks: [
           {
             type: 'p',
-            text: 'En los perfiles con rotura de puente térmico, unas pletinas de poliamida o un relleno de resina separan el perfil exterior del interior y actúan como barrera. Así se evita la transmisión de frío o calor al interior de la vivienda o local, se contribuye de forma eficiente al ahorro energético (hasta un 60 %) y se limita la condensación.',
+            text: 'En los perfiles con rotura de puente térmico, unas pletinas de poliamida o un relleno de resina separan el perfil exterior del interior y actúan como barrera. Así se evita la transmisión de frío o calor al interior de la vivienda o local, se contribuye de forma eficiente al ahorro energético y se limita la condensación.',
           },
         ],
       },
@@ -88,7 +88,7 @@ export const guides: Guide[] = [
         blocks: [
           {
             type: 'p',
-            text: 'Si hablamos de eficiencia energética, las ventanas son quizá el punto más débil de una vivienda, y el vidrio es la mayor parte de la ventana. El doble acristalamiento ofrece un ahorro energético de hasta el 50 %, porque minimiza las pérdidas de frío y calor entre el interior y el exterior.',
+            text: 'Si hablamos de eficiencia energética, las ventanas son quizá el punto más débil de una vivienda, y el vidrio es la mayor parte de la ventana. El doble acristalamiento reduce de forma notable el consumo de energía, porque minimiza las pérdidas de frío y calor entre el interior y el exterior.',
           },
         ],
       },
@@ -115,7 +115,7 @@ export const guides: Guide[] = [
           },
           {
             type: 'p',
-            text: 'Estos sistemas están diseñados para ahorrar hasta un 40 % de aire acondicionado en verano y un 60 % de calefacción en invierno, sin zonas frías junto a la ventana, sin condensación y sin perder luminosidad.',
+            text: 'Estos sistemas están diseñados para reducir el consumo de aire acondicionado en verano y de calefacción en invierno, sin zonas frías junto a la ventana, sin condensación y sin perder luminosidad.',
           },
         ],
       },

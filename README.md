@@ -64,6 +64,7 @@ Playwright usa Chromium. En este entorno está preinstalado; en otro equipo: `np
 |---|---|
 | Teléfonos, emails, dirección, horario | `src/data/site.ts` |
 | Fichas de producto y categorías | `src/data/catalog.ts` (+ imagen en `src/assets/products/`) |
+| Imágenes de la portada y de las categorías | `src/data/media.ts`; imágenes generadas opcionales en `src/assets/generated/` (ver `docs/image-audit.md`) |
 | Guías de «Consejos» | `src/data/guides.ts` |
 | Redirecciones | `docs/redirect-map.csv` (el `.htaccess` se regenera en cada `build`) |
 | Colores y tipografía | `src/styles/global.css` (tokens en `:root`) |

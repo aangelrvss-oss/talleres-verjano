@@ -23,8 +23,8 @@ const Heading = headingLevel;
     <Image
       src={product.image}
       alt=""
-      widths={[380, 560, 765]}
-      sizes="(max-width: 40rem) calc(100vw - 2rem), (max-width: 75rem) 45vw, 380px"
+      widths={[380, 560, 765, 1120].filter((w) => w <= product.image.width)}
+      sizes="(max-width: 47.99rem) calc(100vw - 2rem), (max-width: 75rem) 45vw, 600px"
       loading={eager ? 'eager' : 'lazy'}
     />
     {showCategory && <span class="card__tag">{getCategory(product.category).name}</span>}
@@ -56,8 +56,8 @@ const Heading = headingLevel;
     border-radius: 12px;
     overflow: hidden;
     transition:
-      box-shadow 0.35s var(--ease-out),
-      transform 0.35s var(--ease-out),
+      box-shadow var(--dur-ui) var(--ease-out),
+      transform var(--dur-ui) var(--ease-out),
       border-color 0.35s var(--ease);
   }
   @media (hover: hover) {
@@ -140,7 +140,7 @@ const Heading = headingLevel;
       background-color 0.25s var(--ease),
       border-color 0.25s var(--ease),
       color 0.25s var(--ease),
-      transform 0.35s var(--ease-out);
+      transform var(--dur-ui) var(--ease-out);
   }
   .card:hover .card__arrow {
     background: var(--c-brand);

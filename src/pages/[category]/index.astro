@@ -36,11 +36,49 @@ const breadcrumbs = [
 
   <section class="section" aria-label={`Productos de ${category.name.toLowerCase()}`}>
     <div class="container">
-      <div class="grid grid--3">
-        {items.map((p, i) => <ProductCard product={p} headingLevel="h2" eager={i < 3} delay={i % 3} />)}
+      <div class="cgrid" data-n={items.length}>
+        {items.map((p, i) => <ProductCard product={p} headingLevel="h2" eager={i < 2} delay={i % 3} />)}
       </div>
     </div>
   </section>
 
   <CtaBand />
 </Base>
+
+<style>
+  /* Rejilla sin huecos: con 4 o 5 productos, la primera fila lleva dos
+     tarjetas más anchas; con 6, dos filas de tres. */
+  .cgrid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  .cgrid > :global(*) {
+    grid-column: span 2;
+  }
+  .cgrid[data-n='4'] > :global(*),
+  .cgrid[data-n='5'] > :global(:nth-child(-n + 2)) {
+    grid-column: span 3;
+  }
+  @media (max-width: 62rem) {
+    .cgrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .cgrid > :global(*),
+    .cgrid[data-n='4'] > :global(*),
+    .cgrid[data-n='5'] > :global(:nth-child(-n + 2)) {
+      grid-column: span 1;
+    }
+    .cgrid[data-n='5'] > :global(:first-child) {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .cgrid {
+      grid-template-columns: 1fr;
+    }
+    .cgrid[data-n='5'] > :global(:first-child) {
+      grid-column: auto;
+    }
+  }
+</style>

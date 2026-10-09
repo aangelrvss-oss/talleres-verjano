@@ -41,7 +41,7 @@ const { title, eyebrow, lead, breadcrumbs = [], image, imageAlt = '', imageCapti
       image && (
         <figure class="page-hero__media">
           <div class="page-hero__img">
-            <Image src={image} alt={imageAlt} widths={[480, 765]} sizes="(max-width: 62rem) 100vw, 560px" loading="eager" fetchpriority="high" />
+            <Image src={image} alt={imageAlt} widths={[480, 765, 1120].filter((w) => w <= image.width)} sizes="(max-width: 62rem) 100vw, 560px" loading="eager" fetchpriority="high" />
           </div>
           {imageCaption && <figcaption>{imageCaption}</figcaption>}
         </figure>

@@ -1,8 +1,49 @@
 # Informe de QA
 
-Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v2 (rediseño visual)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
+Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v3 (refinamiento visual, imágenes y conversión)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
 
 Solo se recogen pruebas **realmente ejecutadas**. Limitaciones al final.
+
+## 0. Resumen (v3)
+
+| Prueba | Resultado |
+|---|---|
+| `astro check` | 0 errores, 0 avisos, 0 sugerencias |
+| `npm run build` | 27 páginas, 25 URL en el sitemap, 24 redirecciones (sin cambios de URL) |
+| `npm run check` | Superadas, incluida la nueva comprobación de porcentajes de ahorro sin fuente |
+| Playwright contra `astro preview`, 3 perfiles | **106 superadas**, 8 omitidas (no aplican al perfil) |
+| Playwright contra Apache + PHP real (`.htaccess` y envío en modo de prueba) | **103 superadas**, 11 omitidas (casos simulados o de otro perfil) |
+| Redirecciones (curl contra Apache) | 24/24: 301 → 200 en un solo salto |
+| Desbordamiento horizontal: 27 páginas × 7 anchos (320, 375, 390, 768, 1024, 1440, 1920) | 0 casos en 189 combinaciones; 0 errores de JavaScript |
+| Tabla de series de abatibles | Cabe sin desplazamiento desde 375 px (5 columnas visibles); a 320 px se desplaza 52 px, con sombra indicadora |
+
+**Pruebas nuevas en la v3** («Contenido v3»): imagen principal con `fetchpriority="high"` y rótulo «Imagen ilustrativa»; el hero no muestra cifras técnicas y la banda técnica las asocia a Q87C16 y Q120; no hay porcentajes de ahorro; catálogo de la portada con 1 + 2 tarjetas enlazadas; tabla de series sin desbordar a 375 px; PDF en pestaña nueva con `noopener`; el error «teléfono o correo» marca ambos campos y se corrige al rellenar uno.
+
+**Lighthouse 12 (v3)**, rendimiento / accesibilidad / buenas prácticas / SEO:
+
+| Página | Móvil | LCP móvil | Escritorio | LCP escr. | CLS | Peso (móvil / escr.) |
+|---|---|---|---|---|---|---|
+| `/` | 100 / 100 / 100 / 100 | 1,9 s | 100 / 100 / 100 / 100 | 0,4 s | 0 / 0,001 | 211 / 241 KiB |
+| `/sistemas-aluminio/` | 99 / 100 / 100 / 100 | 1,9 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 207 / 224 KiB |
+| `/sistemas-aluminio/abatibles/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 101 / 105 KiB |
+| `/contacto/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 66 / 70 KiB |
+| `/empresa/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,4 s | 0 / 0,013 | 110 / 133 KiB |
+| `/consejos/rotura-puente-termico/` | 100 / 100 / 100 / 100 | 1,3 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 96 / 176 KiB |
+
+La portada pesa más que en la v2 (165 → 211 KiB en móvil) porque la foto del hero ocupa ahora media pantalla a sangre; el LCP móvil pasa de 1,6 a 1,9 s, dentro del umbral «bueno» (< 2,5 s). TBT de 0–10 ms.
+
+**Defectos encontrados y corregidos en la QA de la v3**
+
+1. Con el error «Indique un teléfono o un correo», el campo de correo se estiraba hasta la altura del de teléfono (que mostraba el mensaje) y quedaba descolocado. `.field` ya no se estira (`align-content: start`).
+2. Ese mismo error solo marcaba el teléfono. Ahora marca los dos campos y ambos se limpian al rellenar uno.
+6. **Detectado por las pruebas**: al corregir un campo y pulsar «Enviar» directamente, la revalidación al salir del campo borraba un mensaje de error, la página se movía y el clic caía fuera del botón. Los errores resueltos se retiran ahora mientras se escribe (`input`), nunca al salir del campo, y no se añaden errores nuevos hasta el siguiente envío.
+3. En móvil, la tabla de series cortaba el título y ocultaba 3 columnas sin ninguna pista visual.
+4. En la portada, la foto de vidrios aparecía dos veces (tarjeta y «Destacados»).
+5. Con 5 productos, la rejilla de la categoría dejaba un hueco.
+
+**Revisión visual (v3)**: capturas a página completa de la portada, «Sistemas en aluminio», la ficha de abatibles y contacto en escritorio (1440 px) y móvil (390 px), más la portada a 1024 px. Estados revisados: hover y foco de las tarjetas del catálogo, hover de la documentación, errores del formulario y tabla de series a 375 px.
+
+**Limitaciones de la v3**: las imágenes generadas con Higgsfield no están en el repositorio (descarga bloqueada por la red del entorno; ver `image-audit.md`), por lo que las capturas y las mediciones corresponden a las imágenes de reserva. Al activarlas, conviene repetir Lighthouse en la portada.
 
 ## 1. Resumen (v2)
 

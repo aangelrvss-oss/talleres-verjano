@@ -41,6 +41,8 @@ const resolvesToFile = (path) => {
 const titles = new Map();
 const descriptions = new Map();
 const PLACEHOLDER = /[Ll]orem ipsum|\bTODO\b|\bFIXME\b|[Pp]laceholder|[Tt]exto de ejemplo|\bXXX\b|\[[Pp]endiente/;
+// Porcentajes de ahorro sin fuente técnica verificada (ver docs/content-inventory.md, §claims)
+const UNVERIFIED_CLAIM = /ahorr[^.]{0,40}\d{2}\s?%|\d{2}\s?%[^.]{0,40}(ahorr|aire acondicionado|calefacci)/i;
 
 for (const file of htmlFiles) {
   const rel = '/' + relative(DIST, file).replace(/index\.html$/, '');
@@ -110,6 +112,7 @@ for (const file of htmlFiles) {
 
   const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
   if (PLACEHOLDER.test(text)) fail(rel, `texto de relleno: «${text.match(PLACEHOLDER)[0]}»`);
+  if (UNVERIFIED_CLAIM.test(text)) fail(rel, `dato comercial sin verificar: «${text.match(UNVERIFIED_CLAIM)[0]}»`);
 }
 
 // Redirecciones

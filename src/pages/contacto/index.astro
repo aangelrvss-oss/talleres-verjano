@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import ContactForm from '../../components/ContactForm.astro';
 import MapEmbed from '../../components/MapEmbed.astro';
 import Icon from '../../components/Icon.astro';
-import { site, fullAddress, primaryPhone, primaryEmail } from '../../data/site';
+import { site, primaryPhone, primaryEmail } from '../../data/site';
 import { localBusiness } from '../../data/schema';
 
 const breadcrumbs = [
@@ -72,7 +72,7 @@ const breadcrumbs = [
       <div class="section-head" data-reveal>
         <p class="eyebrow">Cómo llegar</p>
         <h2 id="mapa-title" class="h-xl">Exposición y fábrica en Vallecas</h2>
-        <p>{fullAddress} ({site.address.district}).</p>
+        <p>En el {site.address.area}, en {site.address.district}. {site.hours.confirmed ? `Horario: ${site.hours.lines.join(', ')}.` : site.hours.note}</p>
       </div>
       <div data-reveal style="--d:1">
         <MapEmbed />
@@ -102,7 +102,7 @@ const breadcrumbs = [
     box-shadow: var(--shadow-lg);
     color: var(--c-ink);
     text-decoration: none;
-    transition: transform 0.35s var(--ease-out);
+    transition: transform var(--dur-ui) var(--ease-out);
   }
   @media (hover: hover) {
     .qc:hover {
@@ -199,6 +199,29 @@ const breadcrumbs = [
     }
     .contact__side {
       position: static;
+    }
+  }
+  /* En móvil, las tarjetas pasan a filas compactas para que el formulario
+     aparezca antes */
+  @media (max-width: 47.99rem) {
+    .quick-contact__grid {
+      gap: var(--s-3);
+    }
+    .qc {
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: var(--s-4);
+      align-items: center;
+      padding: var(--s-4);
+    }
+    .qc__icon {
+      grid-row: span 3;
+      margin-bottom: 0;
+    }
+    .qc__value {
+      font-size: var(--fs-lg);
+    }
+    .qc__value--sm {
+      font-size: var(--fs-base);
     }
   }
 </style>

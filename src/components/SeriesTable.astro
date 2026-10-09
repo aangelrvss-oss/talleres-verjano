@@ -6,12 +6,17 @@ interface Props {
 }
 
 const { series } = Astro.props;
+// Las unidades no se separan del número al partir líneas
+const nb = (c: string) => c.replace(/ (mm|kg)\b/g, '\u00a0$1');
+// Si alguna celda usa la abreviatura RPT, se explica debajo de la tabla
+const usesRpt = series.rows.some((r) => r.some((c) => /\bRPT\b/.test(c)));
 ---
 
 <figure class="series">
+  <p class="series__title" aria-hidden="true">{series.caption}</p>
   <div class="series__scroll" tabindex="0" role="region" aria-label={series.caption}>
     <table>
-      <caption>{series.caption}</caption>
+      <caption class="visually-hidden">{series.caption}</caption>
       <thead>
         <tr>{series.columns.map((c) => <th scope="col">{c}</th>)}</tr>
       </thead>
@@ -19,14 +24,37 @@ const { series } = Astro.props;
         {
           series.rows.map((row) => (
             <tr>
-              {row.map((cell, i) => (i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>))}
+              {row.map((cell, i) =>
+                i === 0 ? (
+                  <th scope="row">{cell}</th>
+                ) : (
+                  <td class:list={{ wrap: i === 1 }}>
+                    {/\bRPT\b/.test(cell) ? (
+                      <Fragment set:html={cell.replace(/\bRPT\b/, '<abbr title="Rotura de puente térmico">RPT</abbr>')} />
+                    ) : (
+                      nb(cell)
+                    )}
+                  </td>
+                ),
+              )}
             </tr>
           ))
         }
       </tbody>
     </table>
   </div>
-  {series.note && <figcaption>{series.note}</figcaption>}
+  {
+    (usesRpt || series.note) && (
+      <figcaption>
+        {usesRpt && (
+          <>
+            <strong>RPT</strong>: rotura de puente térmico.{' '}
+          </>
+        )}
+        {series.note}
+      </figcaption>
+    )
+  }
 </figure>
 
 <style>
@@ -35,29 +63,35 @@ const { series } = Astro.props;
     display: grid;
     gap: var(--s-3);
   }
+  .series__title {
+    font-weight: 750;
+    color: var(--c-ink);
+  }
+  /* Sombras de desplazamiento: indican que hay más columnas si no caben */
   .series__scroll {
     overflow-x: auto;
     border: 1px solid var(--c-line);
     border-radius: var(--radius-lg);
+    background:
+      linear-gradient(90deg, var(--c-white) 30%, rgb(255 255 255 / 0)) left / 2.5rem 100% no-repeat local,
+      linear-gradient(270deg, var(--c-white) 30%, rgb(255 255 255 / 0)) right / 2.5rem 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgb(20 32 46 / 0.16), transparent) left / 0.9rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgb(20 32 46 / 0.16), transparent) right / 0.9rem 100% no-repeat scroll,
+      var(--c-white);
   }
   table {
     width: 100%;
-    min-width: 34rem;
     font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
   }
-  caption {
-    text-align: left;
-    padding: var(--s-4) var(--s-4) var(--s-3);
-    font-weight: 750;
-    color: var(--c-ink);
-  }
   th,
   td {
-    padding: 0.7rem var(--s-4);
+    padding: 0.75rem var(--s-4);
     text-align: left;
-    border-top: 1px solid var(--c-line);
     white-space: nowrap;
+  }
+  tbody tr {
+    border-top: 1px solid var(--c-line);
   }
   thead th {
     background: var(--c-surface);
@@ -73,11 +107,40 @@ const { series } = Astro.props;
   td {
     color: var(--c-ink-soft);
   }
+  abbr {
+    text-decoration: none;
+  }
   tbody tr:hover {
-    background: #fafbfa;
+    background: rgb(244 245 243 / 0.7);
   }
   figcaption {
     font-size: var(--fs-xs);
     color: var(--c-muted);
+  }
+  figcaption strong {
+    color: var(--c-ink-soft);
+  }
+  @media (max-width: 47.99rem) {
+    table {
+      font-size: 0.8125rem;
+    }
+    th,
+    td {
+      padding: 0.65rem 0.45rem;
+    }
+    td {
+      white-space: normal;
+    }
+    th:first-child,
+    td:first-child {
+      padding-left: var(--s-3);
+    }
+    thead th {
+      font-size: 0.6875rem;
+      letter-spacing: 0.03em;
+    }
+    td.wrap {
+      min-width: 4.5rem;
+    }
   }
 </style>

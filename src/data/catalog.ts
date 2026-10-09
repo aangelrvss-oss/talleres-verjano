@@ -24,7 +24,7 @@ import imgArmarios from '../assets/products/frentes-armario.png';
 import imgMamparas from '../assets/products/mamparas-bano.png';
 import imgCerrajeria from '../assets/products/cerrajeria.png';
 import imgEstores from '../assets/products/estores.png';
-import imgPatio from '../assets/stock/patio-corredera-moderna.jpg';
+import { categoryImages, productImageOverride } from './media';
 
 export type Block =
   | { type: 'p'; text: string }
@@ -114,7 +114,7 @@ export const categories: Category[] = [
 ];
 
 const rptParagraph =
-  'Para conseguir mejores resultados de aislamiento térmico utilizamos perfiles de aluminio con rotura de puente térmico (RPT): unas pletinas de poliamida o relleno de resina separan el perfil exterior del interior y actúan como barrera. Así se evita la transmisión de frío o calor al interior de la vivienda o local, se contribuye de forma eficiente al ahorro energético (hasta un 60 %) y se limita la condensación.';
+  'Para conseguir mejores resultados de aislamiento térmico utilizamos perfiles de aluminio con rotura de puente térmico (RPT): unas pletinas de poliamida o relleno de resina separan el perfil exterior del interior y actúan como barrera. Así se evita la transmisión de frío o calor al interior de la vivienda o local, se contribuye de forma eficiente al ahorro energético y se limita la condensación.';
 
 const docBase = '/archivos/01sistemas_de_aluminio';
 
@@ -173,15 +173,15 @@ export const products: Product[] = [
       columns: ['Serie', 'Tipo', 'Marco', 'Hoja', 'Vidrio máx.'],
       rows: [
         ['Q40', 'Serie clásica', '40 mm', '47 mm', '30 mm'],
-        ['Q57', 'Rotura de puente térmico', '50 mm', '67 mm', '36 mm'],
-        ['Q67', 'Rotura de puente térmico', '60 mm', '67 mm', '46 mm'],
-        ['Q67+', 'Rotura de puente térmico', '60 mm', '67 mm', '46 mm'],
-        ['Q75', 'Rotura de puente térmico', '75 mm', '85 mm', '56 mm'],
-        ['Q75+', 'Rotura de puente térmico', '75 mm', '85 mm', '56 mm'],
-        ['Q77C16', 'RPT, canal 16', '70 mm', '77 mm', '56 mm'],
-        ['Q77+', 'Rotura de puente térmico', '70 mm', '77 mm', '56 mm'],
-        ['Q87C16', 'RPT, canal 16', '80 mm', '87 mm', '62 mm'],
-        ['Q87HO', 'Rotura de puente térmico', '80 mm', '87 mm', '62 mm'],
+        ['Q57', 'RPT', '50 mm', '67 mm', '36 mm'],
+        ['Q67', 'RPT', '60 mm', '67 mm', '46 mm'],
+        ['Q67+', 'RPT', '60 mm', '67 mm', '46 mm'],
+        ['Q75', 'RPT', '75 mm', '85 mm', '56 mm'],
+        ['Q75+', 'RPT', '75 mm', '85 mm', '56 mm'],
+        ['Q77C16', 'RPT · canal 16', '70 mm', '77 mm', '56 mm'],
+        ['Q77+', 'RPT', '70 mm', '77 mm', '56 mm'],
+        ['Q87C16', 'RPT · canal 16', '80 mm', '87 mm', '62 mm'],
+        ['Q87HO', 'RPT', '80 mm', '87 mm', '62 mm'],
       ],
       note: 'Medidas según la información publicada por Talleres Verjano. Consulte el catálogo del fabricante para valores de transmitancia y ensayos.',
     },
@@ -504,7 +504,7 @@ export const products: Product[] = [
         blocks: [
           {
             type: 'p',
-            text: 'No escatime al acristalar sus ventanas: el doble acristalamiento ofrece un ahorro energético de hasta el 50 %, ya que minimiza las pérdidas de frío y calor entre el interior y el exterior. Un buen vidrio le aportará un gran ahorro en la factura de la luz y el gas.',
+            text: 'No escatime al acristalar sus ventanas: el doble acristalamiento reduce de forma notable el consumo de energía, ya que minimiza las pérdidas de frío y calor entre el interior y el exterior. Un buen vidrio le aportará un gran ahorro en la factura de la luz y el gas.',
           },
         ],
       },
@@ -565,7 +565,7 @@ export const products: Product[] = [
           },
           {
             type: 'p',
-            text: 'Estos sistemas están diseñados para ahorrar hasta un 40 % de aire acondicionado en verano y un 60 % de calefacción en invierno, contribuyendo a reducir las emisiones de CO₂.',
+            text: 'Estos sistemas están diseñados para reducir el consumo de aire acondicionado en verano y de calefacción en invierno, contribuyendo a reducir las emisiones de CO₂.',
           },
           {
             type: 'list',
@@ -1005,7 +1005,7 @@ export const products: Product[] = [
         ],
       },
     ],
-    related: ['mamparas-bano', 'estores', 'cerrajeria', 'correderas'],
+    related: ['mamparas-bano', 'estores', 'cerrajeria'],
     legacyUrl: '/03_otros_productos_frentes_de_armario.html',
   },
   {
@@ -1060,7 +1060,7 @@ export const products: Product[] = [
       },
     ],
     brands: ['Kassandra'],
-    related: ['frentes-armario', 'vidrios-acristalamientos', 'cerrajeria', 'estores'],
+    related: ['frentes-armario', 'vidrios-acristalamientos', 'estores'],
     legacyUrl: '/03_otros_productos_mamparas_de_bano.html',
   },
   {
@@ -1175,12 +1175,17 @@ export const products: Product[] = [
   },
 ];
 
-const categoryImages: Record<CategorySlug, ImageMetadata> = {
-  'sistemas-aluminio': imgPatio,
-  'materiales-adicionales': imgVidrios,
-  'otros-productos': imgToldos,
-};
-export const getCategoryImage = (slug: CategorySlug) => categoryImages[slug];
+// Imágenes generadas que sustituyen a la foto original de algunas fichas (si existen)
+for (const p of products) {
+  const o = productImageOverride(p.slug);
+  if (o) {
+    p.image = o.src;
+    p.imageAlt = o.alt;
+  }
+}
+
+export const getCategoryImage = (slug: CategorySlug) => categoryImages[slug].src;
+export const getCategoryMedia = (slug: CategorySlug) => categoryImages[slug];
 
 export const getCategory = (slug: CategorySlug) => categories.find((c) => c.slug === slug)!;
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);

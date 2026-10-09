@@ -157,3 +157,22 @@ Procedencia original desconocida (probablemente material gráfico de fabricantes
 | Viewport | `user-scalable=no` (impide el zoom: problema de accesibilidad) |
 | Dependencias | jQuery (dos copias), Bootstrap 3.3.7 desde CDN, w3.css desde w3schools.com, Font Awesome 5 desde CDN, fancybox 1.3.4, owl.carousel, meanmenu, wow.js |
 | Google Maps | Iframe cargado sin consentimiento previo |
+
+## 4. Verificación de datos técnicos y comerciales (v3)
+
+Contrastados el 9/10/2026 con los catálogos PDF del fabricante enlazados desde la web actual (leídos con un analizador de PDF). Regla aplicada: lo que no se puede verificar en una fuente técnica no se presenta como dato publicitario.
+
+| Dato | Dónde aparecía | Fuente consultada | Resultado | Decisión |
+|---|---|---|---|---|
+| Vidrio de hasta **62 mm** | Hero de la portada («series abatibles con RPT»), banda técnica («series de 80 mm»), tabla de abatibles | `Q87 C16.pdf` (QSystems, 54 págs.): «La capacidad de acristalamiento varía de 32 a 62 mm» | **Verificado para Q87C16.** Q87HO figura con 62 mm en la web actual; no se ha abierto su catálogo | Se retira del hero. En la banda técnica: «62 mm de acristalamiento máximo en la serie abatible Q87C16», con la fuente («catálogos técnicos de QSystems») |
+| **400 kg** por hoja | Hero de la portada («correderas elevables»), ficha de elevables | `Q120.pdf` (QSystems, 52 págs.): «corredera elevable hasta 400 kilos por hoja»; «Dimensión de hoja… 950 a 3300 mm (L); 950 a 2800 mm (H). Peso máximo de 400 kilos por hoja elevable» | **Verificado para Q120** | Se retira del hero. Banda técnica: «400 kg por hoja en la corredera elevable Q120». La ficha ya lo atribuye a la Q120 |
+| Triple junta | Ficha de abatibles | `Q87 C16.pdf`: «estanqueidad asegurada a través de triple junta en EPDM» | **Verificado para Q87C16** | Banda técnica: «3 juntas de EPDM… de la serie Q87C16» |
+| Hojas de 3300 × 2800 mm | Ficha de elevables | `Q120.pdf` (ver arriba) | Verificado | Se mantiene |
+| Ahorro de **hasta un 60 %** con RPT | Portada («≤ 60 %»), ficha de abatibles, guía de RPT | Solo en el texto de la web actual; no aparece en los catálogos consultados | **No verificable** | Retirado. El texto dice que la RPT «contribuye de forma eficiente al ahorro energético», sin cifra. **Pendiente de confirmar** con una fuente (ensayo o documentación del fabricante) |
+| Doble acristalamiento: ahorro de **hasta el 50 %** | Ficha de vidrios, guía de vidrios | Solo en la web actual | **No verificable** | Retirado: «reduce de forma notable el consumo de energía». Pendiente de fuente (SGG Climalit) |
+| Climalit Planitherm ATR: **40 %** de aire acondicionado y **60 %** de calefacción | Ficha de vidrios, guía de vidrios | Solo en la web actual (parece material comercial del fabricante) | **No verificable** | Retirado: «reducir el consumo de aire acondicionado en verano y de calefacción en invierno». Pendiente de documento de Saint-Gobain |
+| Series QSystems de la tabla de abatibles (marco, hoja, vidrio) | Ficha de abatibles | Web actual; Q87C16 coincide con su catálogo | Parcialmente verificado | Se mantienen con la nota «Medidas según la información publicada por Talleres Verjano» |
+| Marcas (QSystems, SGG Climalit, Cherubini, Kassandra) | Portada, fichas | Web actual; los PDF de perfiles son de QSystems | QSystems verificado; el resto, según la web actual | Se mantienen |
+
+`npm run check` falla si alguna página vuelve a mostrar un porcentaje de ahorro (expresión `UNVERIFIED_CLAIM` en `scripts/check-site.mjs`).
+

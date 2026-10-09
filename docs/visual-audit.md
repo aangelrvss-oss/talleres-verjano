@@ -42,3 +42,28 @@ La v1 destacaba **«Desde 1968»** (hero, antetítulos, títulos SEO) y mostraba
 10. **Footer** con llamada a la acción y logotipo.
 
 **Descartado**: buscador o filtros (15 productos en 3 categorías no lo justifican), carruseles automáticos, parallax, vídeo de fondo, cursores personalizados, librerías de animación (GSAP, AOS…), subida de archivos y WhatsApp (número no confirmado).
+
+## 4. Iteración v3: diagnóstico de la v2 y cambios aplicados
+
+Revisión de la v2 en Chromium a 1440, 1024 y 390 px (capturas en el informe final). La v2 tenía buen ritmo, pero arrastraba problemas de composición, de rigor en los datos y de exceso de llamadas a la acción.
+
+| Área | Problema en la v2 | Cambio en la v3 |
+|---|---|---|
+| **Hero** | Foto vertical de 34 rem dentro de un marco desplazado, sobre un bloque oscuro: se leía como «tarjeta pequeña dentro de un bloque oscuro». Dos datos flotantes tapaban la foto | Foto **a sangre en la mitad derecha**, de arriba abajo y hasta el borde de la ventana, sin marco ni sombra. En móvil, foto 4:3 a todo el ancho y texto debajo. Titular algo menor (máx. 72 px) para no pasar de 4 líneas |
+| **Datos del hero** | «62 mm de vidrio máximo en las series abatibles con RPT» y «400 kg por hoja en correderas elevables» se presentaban como generales | Retirados del hero. En la banda técnica, con su serie y su fuente: «62 mm… en la serie abatible Q87C16», «400 kg por hoja en la corredera elevable Q120», «Datos de los catálogos técnicos de QSystems». El hero muestra 3 garantías verificables: fábrica y exposición en Madrid, perfiles QSystems con RPT y asesoramiento sin compromiso |
+| **Porcentajes de ahorro** | «≤ 60 % de ahorro energético» (portada), «hasta el 50 %» y «40 %/60 %» (vidrios, guías) | Sin fuente técnica: retirados en toda la web y bloqueados en `npm run check` (ver `content-inventory.md` §4) |
+| **Accesos rápidos del hero** | Repetían las 3 categorías justo encima del catálogo | Eliminados |
+| **Catálogo de la portada** | Chips de todos los productos sobre las fotos (ruido); la foto de vidrios aparecía también en «Destacados» | 1 tarjeta principal + 2 secundarias, sin chips. La principal lista sus 5 sistemas como texto. Toda la tarjeta es clicable, con foco visible |
+| **Destacados** | 6 tarjetas que repetían el catálogo | 3 sistemas de aluminio («Abrir, deslizar o elevar») |
+| **Rojo** | Rojo en guiones de etiquetas, números, líneas, iconos y bordes: competía con los botones | Rojo solo para la acción (ver `design-system.md`, «Regla de color») |
+| **Fichas: cierre** | Hero con CTA + índice con «Presupuesto» + tarjeta lateral + banda roja final: 4 llamadas a la acción | Se retira la banda roja de las fichas. La tarjeta lateral («Presupuesto sin compromiso», con el nombre del producto) cierra la ficha en móvil |
+| **Fichas: tarjeta lateral** | «¿Le interesa sistemas abatibles?» (concordancia forzada) | Antetítulo con el producto y título «Presupuesto sin compromiso» |
+| **Fichas: tabla de series** | En móvil se cortaba el título y las columnas «Marco», «Hoja» y «Vidrio» quedaban fuera de la vista sin ninguna pista | Título fuera de la zona desplazable, «RPT» abreviado con leyenda, celdas que pueden partirse y sombras laterales. Las 5 columnas caben desde 375 px; a 320 px se desplaza con indicación |
+| **Fichas: PDF** | 10 cajas pequeñas en rejilla; «Serie 40 · catálogo RM40» partía en dos líneas | Lista de filas: icono, «Serie Q57», «Catálogo técnico · PDF», icono de pestaña nueva; contador y fabricante en la entradilla |
+| **Relacionados** | «Frentes de armario» sugería «Sistemas correderos» y «Mamparas» sugería «Cerrajería» | Corregido; título «También le puede interesar» |
+| **Categorías** | Con 5 productos, la rejilla 3 + 2 dejaba un hueco | Rejilla de 6 columnas: 2 tarjetas anchas + 3 (con 4 productos, 2 + 2) |
+| **Contacto** | En móvil, 3 tarjetas altas antes del formulario; la dirección aparecía 3 veces; el aviso «al menos un teléfono o un correo» quedaba bajo el selector de producto | Tarjetas en filas compactas en móvil; la sección del mapa ya no repite la dirección; el aviso va bajo teléfono y correo |
+| **Movimiento** | 6 duraciones distintas para hover y paneles; desplazamientos de 28–32 px | Tokens `--dur-ui`, `--dur-panel`, `--dur`, `--stagger`; desplazamientos de 18–24 px y escalonado con tope |
+| **Imágenes** | Ver `image-audit.md` | 5 imágenes generadas con Higgsfield, listas para activarse al copiarlas (§3 de `image-audit.md`). Vídeo evaluado y descartado |
+
+Se mantienen sin cambios: URLs, 27 páginas, 24 redirecciones, metadatos, sitemap, datos estructurados y enlaces a los PDF.

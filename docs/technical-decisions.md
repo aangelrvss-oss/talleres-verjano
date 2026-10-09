@@ -109,3 +109,13 @@ El sitio publicado no carga ninguna librería de terceros en el navegador.
 - **Índice de la ficha**: el resaltado de la sección activa se calcula por posición de scroll con `requestAnimationFrame` (más fiable que IntersectionObserver para secciones de alturas muy distintas).
 - **Datos pendientes ocultos por indicadores** (`foundingYearConfirmed`, `hours.confirmed`) en `site.ts`, en lugar de mostrarlos con avisos.
 - **Imágenes de stock**: dos fotos de Unsplash de alta resolución para el hero y las cabeceras (ver `image-credits.md`). Se recortaron de capturas de página porque el dominio de imágenes de Unsplash está bloqueado desde el entorno de desarrollo; conviene sustituirlas por los originales antes de publicar.
+
+## 12. Iteración v3: decisiones técnicas
+
+- **Imágenes editoriales con sustituto opcional** (`src/data/media.ts`). `import.meta.glob` busca archivos en `src/assets/generated/`; si existen, se usan con su texto alternativo, su punto de enfoque y el rótulo «generada con IA»; si no, se usa la imagen de reserva. Así la web compila y se publica igual con o sin las imágenes generadas, y activarlas no exige tocar plantillas. Las fichas admiten lo mismo (`ficha-<slug>.jpg`) para abatibles y correderas.
+- **Sin ampliación de imágenes**: los `widths` de `<Image>` se filtran con el ancho real del archivo (`w <= src.width`).
+- **Descarga de imágenes generadas bloqueada**: el dominio de Higgsfield (`d8j0ntlcm91z4.cloudfront.net`) no está permitido por la política de red del entorno de desarrollo. No se ha intentado eludir el bloqueo. Ver `image-audit.md` §3.
+- **Vídeo**: descartado para el hero por peso, LCP y un corte brusco a mitad del clip (`image-audit.md` §4).
+- **Comprobación de datos comerciales**: `scripts/check-site.mjs` falla si una página muestra un porcentaje de ahorro (`UNVERIFIED_CLAIM`). Los datos técnicos que se mantienen se han contrastado con los PDF de QSystems (`content-inventory.md` §4).
+- **Tokens de movimiento** (`--dur-ui`, `--dur-panel`, `--dur`, `--stagger`) en lugar de duraciones sueltas. Sin librerías nuevas.
+- **Pruebas nuevas** (Playwright, «Contenido v3»): imagen principal prioritaria, cifras técnicas con su serie, 3 tarjetas de catálogo enlazadas, tabla de series sin desbordar a 375 px y PDF en pestaña nueva.

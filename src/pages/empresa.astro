@@ -154,12 +154,12 @@ const pillars = [
     align-content: start;
     padding: var(--s-6) var(--s-5);
     background: var(--c-white);
-    border-top: 3px solid var(--c-brand);
+    border-top: 3px solid var(--c-ink);
     border-radius: 0 0 12px 12px;
     box-shadow: var(--shadow-sm);
   }
   .pillars :global(svg) {
-    color: var(--c-brand);
+    color: var(--c-blue);
   }
   .pillars h3 {
     font-size: var(--fs-lg);
@@ -182,7 +182,7 @@ const pillars = [
     text-decoration: none;
   }
   .lines a {
-    transition: padding-left 0.35s var(--ease-out);
+    transition: padding-left var(--dur-ui) var(--ease-out);
   }
   .lines a:hover {
     padding-left: var(--s-3);
@@ -207,7 +207,7 @@ const pillars = [
     color: var(--c-ink-soft);
   }
   .visit :global(svg) {
-    color: var(--c-brand);
+    color: var(--c-ink-soft);
   }
   .visit a {
     font-weight: 700;

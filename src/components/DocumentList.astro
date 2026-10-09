@@ -4,25 +4,36 @@ import type { TechDocument } from '../data/catalog';
 
 interface Props {
   documents: TechDocument[];
+  /** Fabricante que publica los documentos (se muestra como subtítulo). */
+  brand?: string;
 }
 
-const { documents } = Astro.props;
+const { documents, brand } = Astro.props;
+// «Q57» → «Serie Q57»; las etiquetas que ya describen el documento se dejan igual
+const title = (label: string) => (/^Q[\w+]+$/.test(label) ? `Serie ${label}` : label);
 ---
 
 <section class="docs" aria-labelledby="docs-title">
-  <h2 id="docs-title">Documentación técnica</h2>
-  <p class="docs__note">Catálogos y fichas del fabricante en PDF.</p>
+  <div class="docs__head">
+    <h2 id="docs-title">Documentación técnica</h2>
+    <p class="docs__note">
+      {documents.length === 1 ? '1 documento' : `${documents.length} documentos`} del fabricante en PDF{brand ? ` (${brand})` : ''}. Se abren en una pestaña nueva.
+    </p>
+  </div>
   <ul>
     {
       documents.map((d) => (
         <li>
           <a href={d.href} target="_blank" rel="noopener" type="application/pdf">
-            <Icon name="file" size={20} />
-            <span>
-              {d.label}
-              <span class="visually-hidden"> (PDF, se abre en una pestaña nueva)</span>
+            <span class="docs__icon">
+              <Icon name="file" size={20} />
             </span>
-            <span class="docs__type" aria-hidden="true">PDF</span>
+            <span class="docs__text">
+              <span class="docs__name">{title(d.label)}</span>
+              <span class="docs__meta">Catálogo técnico · PDF</span>
+              <span class="visually-hidden"> (se abre en una pestaña nueva)</span>
+            </span>
+            <Icon name="external" size={18} class="docs__go" />
           </a>
         </li>
       ))
@@ -33,7 +44,11 @@ const { documents } = Astro.props;
 <style>
   .docs {
     display: grid;
-    gap: var(--s-3);
+    gap: var(--s-5);
+  }
+  .docs__head {
+    display: grid;
+    gap: var(--s-2);
   }
   h2 {
     font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
@@ -46,41 +61,62 @@ const { documents } = Astro.props;
   ul {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: var(--s-3);
-    margin-top: var(--s-2);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    column-gap: var(--s-6);
+    border-top: 1px solid var(--c-line);
+  }
+  li {
+    border-bottom: 1px solid var(--c-line);
   }
   a {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: var(--s-3);
-    min-height: 3.75rem;
-    padding: 0.75rem var(--s-4);
-    border: 1px solid var(--c-line);
-    border-radius: 10px;
-    background: var(--c-white);
+    gap: var(--s-4);
+    min-height: 4.25rem;
+    padding: var(--s-3) var(--s-2);
     color: var(--c-ink);
-    font-weight: 700;
-    font-size: var(--fs-sm);
     text-decoration: none;
-    transition:
-      border-color 0.2s var(--ease),
-      box-shadow 0.3s var(--ease-out),
-      transform 0.3s var(--ease-out);
+    transition: background-color 0.2s var(--ease);
   }
   a:hover {
-    border-color: var(--c-ink);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    background: var(--c-surface);
   }
-  a :global(svg) {
-    color: var(--c-brand);
+  .docs__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--c-surface);
+    color: var(--c-ink-soft);
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
   }
-  .docs__type {
-    font-size: 0.6875rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+  a:hover .docs__icon {
+    background: var(--c-ink);
+    color: var(--c-white);
+  }
+  .docs__text {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .docs__name {
+    font-weight: 750;
+  }
+  .docs__meta {
+    font-size: var(--fs-xs);
     color: var(--c-muted);
+  }
+  a :global(.docs__go) {
+    color: var(--c-muted);
+    transition:
+      transform var(--dur-ui) var(--ease-out),
+      color 0.2s var(--ease);
+  }
+  a:hover :global(.docs__go) {
+    color: var(--c-blue);
+    transform: translate(2px, -2px);
   }
 </style>

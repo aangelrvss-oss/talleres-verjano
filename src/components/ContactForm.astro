@@ -32,6 +32,23 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
       </div>
 
       <div class="field">
+        <label for="f-producto">¿Qué le interesa?</label>
+        <select id="f-producto" name="producto">
+          <option value="">Seleccione (opcional)</option>
+          {
+            categories.map((c) => (
+              <optgroup label={c.name}>
+                {productsIn(c.slug).map((p) => (
+                  <option value={p.slug}>{p.name}</option>
+                ))}
+              </optgroup>
+            ))
+          }
+          <option value="otro">Otro / no lo sé todavía</option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="f-telefono">Teléfono</label>
         <input
           id="f-telefono"
@@ -49,23 +66,6 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
         <label for="f-email">Correo electrónico</label>
         <input id="f-email" name="email" type="email" autocomplete="email" maxlength="150" aria-describedby="h-contacto e-email" />
         <p class="field-error" id="e-email" data-error-for="email"></p>
-      </div>
-
-      <div class="field">
-        <label for="f-producto">¿Qué le interesa?</label>
-        <select id="f-producto" name="producto">
-          <option value="">Seleccione (opcional)</option>
-          {
-            categories.map((c) => (
-              <optgroup label={c.name}>
-                {productsIn(c.slug).map((p) => (
-                  <option value={p.slug}>{p.name}</option>
-                ))}
-              </optgroup>
-            ))
-          }
-          <option value="otro">Otro / no lo sé todavía</option>
-        </select>
       </div>
 
       <p class="hint form__hint" id="h-contacto">Indíquenos al menos un teléfono o un correo para poder responderle.</p>
@@ -200,6 +200,8 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
         el?.setAttribute('aria-invalid', err ? 'true' : 'false');
         if (out) out.textContent = err ? err.msg : '';
       });
+      // «Indique un teléfono o un correo»: el error afecta a los dos campos
+      if (errors.some((e) => e.name === 'telefono') && !field('telefono')?.value.trim()) field('email')?.setAttribute('aria-invalid', 'true');
       summaryList.replaceChildren(
         ...errors.map((e) => {
           const li = document.createElement('li');
@@ -225,13 +227,21 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
       });
     };
 
-    // Revalida un campo al salir de él, solo si ya estaba marcado como erróneo
-    form.addEventListener('focusout', (e) => {
+    // Mientras se escribe, se retiran los errores ya resueltos (nunca se añaden
+    // nuevos hasta el siguiente envío). Se hace en «input» y no al salir del
+    // campo para que la página no se mueva justo cuando se pulsa «Enviar».
+    // Teléfono y correo se revisan juntos, porque basta con uno de los dos.
+    form.addEventListener('input', (e) => {
       const target = e.target as HTMLInputElement;
       if (target.getAttribute('aria-invalid') !== 'true') return;
-      if (!validate().some((er) => er.name === target.name)) {
-        target.setAttribute('aria-invalid', 'false');
-        const out = form.querySelector<HTMLElement>(`[data-error-for="${target.name}"]`);
+      const names = ['telefono', 'email'].includes(target.name) ? ['telefono', 'email'] : [target.name];
+      const errors = validate();
+      for (const name of names) {
+        const out = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+        const current = errors.find((er) => er.name === name)?.msg ?? '';
+        // Se mantiene solo si sigue siendo exactamente el error que se muestra
+        if (current && current === (out?.textContent ?? '')) continue;
+        field(name)?.setAttribute('aria-invalid', 'false');
         if (out) out.textContent = '';
       }
     });
@@ -302,8 +312,6 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
   .form__full,
   .form__hint {
     grid-column: 1 / -1;
-  }
-  .form__hint {
     margin-top: calc(-1 * var(--s-3));
   }
   .check {

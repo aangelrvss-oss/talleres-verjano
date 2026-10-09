@@ -302,6 +302,60 @@ test.describe('Contacto', () => {
   });
 });
 
+test.describe('Contenido v3', () => {
+  test('portada: imagen principal prioritaria y datos técnicos con su serie', async ({ page }) => {
+    await page.goto('/');
+    const hero = page.locator('.hero__media img');
+    await expect(hero).toHaveAttribute('fetchpriority', 'high');
+    await expect(hero).toHaveAttribute('loading', 'eager');
+    await expect(page.locator('.hero__credit')).toContainText('Imagen ilustrativa');
+    // Las cifras técnicas solo aparecen junto a la serie a la que se refieren
+    await expect(page.locator('.hero')).not.toContainText('62 mm');
+    const facts = page.locator('.tech__facts');
+    await expect(facts).toContainText('Q87C16');
+    await expect(facts).toContainText('Q120');
+    await expect(page.locator('main')).not.toContainText(/\d{2}\s?% de ahorro/);
+  });
+
+  test('catálogo de la portada: 1 tarjeta principal y 2 secundarias, enlazadas', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.bento .tile')).toHaveCount(3);
+    await expect(page.locator('.bento .tile--lg')).toHaveCount(1);
+    await page.locator('.bento .tile').nth(1).locator('.tile__title a').click();
+    await expect(page).toHaveURL(/\/materiales-adicionales\/$/);
+  });
+
+  test('tabla de series legible: todas las columnas y sin desbordar a 375 px', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto('/sistemas-aluminio/abatibles/');
+    const table = page.locator('.series table');
+    await expect(table.locator('thead th')).toHaveCount(5);
+    await expect(page.locator('.series figcaption')).toContainText('rotura de puente térmico');
+    const [sw, cw] = await page.locator('.series__scroll').evaluate((e) => [e.scrollWidth, e.clientWidth]);
+    expect(sw).toBeLessThanOrEqual(cw);
+  });
+
+  test('formulario: «teléfono o correo» marca ambos campos y se corrige con uno', async ({ page }) => {
+    await page.goto('/contacto/');
+    await page.locator('[data-submit]').click();
+    await expect(page.locator('#f-telefono')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#f-email')).toHaveAttribute('aria-invalid', 'true');
+    await page.locator('#f-email').fill('ana@ejemplo.es');
+    await page.locator('#f-mensaje').focus();
+    await expect(page.locator('#f-telefono')).toHaveAttribute('aria-invalid', 'false');
+    await expect(page.locator('#f-email')).toHaveAttribute('aria-invalid', 'false');
+    await expect(page.locator('#e-telefono')).toBeEmpty();
+  });
+
+  test('documentación: PDF del fabricante en pestaña nueva', async ({ page }) => {
+    await page.goto('/sistemas-aluminio/elevables/');
+    const doc = page.locator('.docs a').first();
+    await expect(doc).toHaveAttribute('href', /^\/archivos\/.+\.pdf$/);
+    await expect(doc).toHaveAttribute('target', '_blank');
+    await expect(doc).toHaveAttribute('rel', /noopener/);
+  });
+});
+
 test.describe('SEO', () => {
   test('metadatos básicos y datos estructurados', async ({ page }) => {
     await page.goto('/sistemas-aluminio/elevables/');

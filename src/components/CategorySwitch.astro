@@ -55,9 +55,9 @@ const { current } = Astro.props;
     right: var(--s-3);
     bottom: -1px;
     height: 3px;
-    background: var(--c-brand);
+    background: var(--c-ink);
     transform: scaleX(0);
-    transition: transform 0.3s var(--ease-out);
+    transition: transform var(--dur-ui) var(--ease-out);
   }
   .switch__item:hover {
     color: var(--c-ink);
@@ -83,7 +83,7 @@ const { current } = Astro.props;
     color: var(--c-ink-soft);
   }
   .switch__item[aria-current] .switch__count {
-    background: var(--c-brand);
+    background: var(--c-ink);
     color: var(--c-white);
   }
 </style>
