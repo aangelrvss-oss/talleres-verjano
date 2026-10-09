@@ -2,6 +2,8 @@
 
 Documento único para publicar la nueva web sin riesgos. Estado a 9/10/2026, rama `claude/busy-gauss-k22go8`.
 
+> **Estado: NO lista para publicar.** Abiertos los bloqueantes B1 (aviso legal), B2 (prueba real del formulario), B3 (conservación de los PDF) y B4 (copia de seguridad). La parte visual está cerrada (`docs/qa-report.md` §000).
+
 **Regla**: una casilla solo se marca cuando la comprobación se ha hecho de verdad, con fecha y responsable en el registro del final. Nada de este documento se ha ejecutado aún en el alojamiento real: no hay acceso a él desde el entorno de desarrollo.
 
 ## 1. Bloqueantes confirmados

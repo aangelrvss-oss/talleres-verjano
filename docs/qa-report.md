@@ -4,6 +4,26 @@
 
 Solo se recogen pruebas **realmente ejecutadas**. Limitaciones al final.
 
+## 000. Revisión visual final (imágenes definitivas)
+
+Ejecutado el 9/10/2026. Código: `329d053` (las capturas se tomaron en `5825a35`; entre ambos solo cambia un texto alternativo, que no se ve).
+
+| Prueba | Resultado |
+|---|---|
+| Carga de imágenes: 27 páginas a 390 y 1440 px, tras desplazar para cargar las diferidas | 355 imágenes visibles comprobadas, **0 rotas** |
+| Pies de foto de las cabeceras | «Imagen ilustrativa generada con IA» en portada, 3 categorías, abatibles y correderas; «Imagen ilustrativa del producto» en las demás fichas; «Imagen ilustrativa» en empresa y guías (fotos de Unsplash). Correcto en las 22 páginas con imagen de cabecera |
+| Contraste del texto sobre foto (catálogo de la portada), medido con el **píxel más claro** detrás de cada texto en 7 anchos | Antes: 2,4:1 en escritorio (contador de las tarjetas secundarias) y 1,6:1 en móvil/tableta (tarjeta principal). **Corregido** (`5825a35`): ≥ 5,2:1 en escritorio y ≥ 10,8:1 en una columna |
+| Recorte de las imágenes generadas (320, 390, 768, 1024, 1440, 1920) | Correcto; en una columna, la foto completa queda visible sobre el texto |
+| Mosquiteras | La foto sí muestra mosquiteras plisadas (revisada al 100 %), poco legibles a tamaño de tarjeta. Texto alternativo corregido. Sustitución recomendada, no bloquea |
+| `npm test` / Playwright contra Apache | 106 superadas, 8 omitidas / 103 superadas, 11 omitidas |
+| Desbordamiento 27 páginas × 7 anchos | 0 en 189; 0 errores JS |
+| `scripts/test-form.sh` (sin envío) | 9/9 |
+| `scripts/verify-deploy.sh` (Apache local) | 27 páginas y 24 redirecciones correctas; fallos esperados en local: 18 PDF (sin `archivos/`) y canonical de producción |
+| Lighthouse (móvil / escritorio) | `/` 100·100·100·100 / 100·100·100·100 (LCP 1,9 / 0,4 s) · `/sistemas-aluminio/` 98 / 100 (LCP 2,4 / 0,5 s) · abatibles 100 / 100 (1,7 / 0,4 s) · contacto 100 / 100 (1,4 / 0,3 s) |
+| Vista previa (artefacto) | Actualizada con las capturas definitivas (versión 2) |
+
+**Publicación: no lista.** Siguen abiertos los 4 bloqueantes de `docs/launch-checklist.md` §1: aviso legal, copia de seguridad, conservación de los PDF y prueba real del formulario.
+
 ## 00. Pre-lanzamiento (tras incorporar las imágenes)
 
 Ejecutado el 9/10/2026 sobre los commits `054dc0f` (imágenes) y el de documentación operativa. Medido con las **imágenes definitivas**.
