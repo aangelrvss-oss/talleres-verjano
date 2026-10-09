@@ -1,6 +1,6 @@
 # Generado por scripts/gen-redirects.mjs a partir de docs/redirect-map.csv. No editar a mano.
 Options -Indexes
-DirectoryIndex index.html index.php
+DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
 AddDefaultCharset UTF-8
@@ -41,7 +41,6 @@ AddType image/webp .webp
 
 # --- Redirecciones permanentes de la web antigua
 RedirectMatch 301 ^/index\.php$ /
-RedirectMatch 301 ^/index\.html$ /
 RedirectMatch 301 ^/01aluminio_sistemas_abatibles\.html$ /sistemas-aluminio/abatibles/
 RedirectMatch 301 ^/01aluminio_sistemas_corredera\.html$ /sistemas-aluminio/correderas/
 RedirectMatch 301 ^/01aluminio_sistemas_elevables\.html$ /sistemas-aluminio/elevables/

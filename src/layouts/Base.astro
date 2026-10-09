@@ -27,6 +27,9 @@ interface Props {
 const { title, description, rawTitle = false, ogImage = defaultOg, noindex = false, breadcrumbs, jsonLd = [] } = Astro.props;
 
 const fullTitle = rawTitle ? title : `${title} | ${site.name}`;
+// STAGING=1 en la compilación: toda la web queda fuera de los buscadores (vista previa)
+const staging = process.env.STAGING === '1';
+const robots = noindex || staging ? 'noindex, follow' : null;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const og = await getImage({ src: ogImage, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 82 });
 const ogUrl = new URL(og.src, Astro.site).href;
@@ -54,7 +57,7 @@ if (breadcrumbs && breadcrumbs.length > 1) {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {robots && <meta name="robots" content={robots} />}
     <meta name="theme-color" content="#14202e" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.png" type="image/png" />

@@ -1,6 +1,5 @@
 # Generado por scripts/gen-redirects.mjs a partir de docs/redirect-map.csv. No editar a mano.
 /index.php / 301
-/index.html / 301
 /01aluminio_sistemas_abatibles.html /sistemas-aluminio/abatibles/ 301
 /01aluminio_sistemas_corredera.html /sistemas-aluminio/correderas/ 301
 /01aluminio_sistemas_elevables.html /sistemas-aluminio/elevables/ 301

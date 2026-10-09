@@ -428,7 +428,13 @@ const links = [
       border-radius: var(--radius);
     }
     .call__text {
-      display: none;
+      /* Oculto visualmente pero accesible: el icono necesita nombre */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
     }
     .menu-btn {
       display: inline-grid;

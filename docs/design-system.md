@@ -17,17 +17,18 @@ Tokens definidos en `src/styles/global.css` (`:root`).
 | Token | Valor | Uso |
 |---|---|---|
 | `--c-ink` | `#14202e` | Texto principal, fondos oscuros (pie, bandas) |
-| `--c-ink-soft` | `#3c4a5a` | Texto secundario (contraste 8,9:1 sobre blanco) |
-| `--c-muted` | `#5b6775` | Metadatos y leyendas (5,9:1) |
+| `--c-ink-soft` | `#3c4a5a` | Texto secundario (contraste 9,1:1 sobre blanco) |
+| `--c-muted` | `#5b6775` | Metadatos y leyendas (5,8:1; 5,3:1 sobre `--c-surface`) |
 | `--c-line` | `#dde2e7` | Bordes y separadores |
+| `--c-grid` | `#e8ebe8` | Líneas verticales de fondo de las cabeceras (motivo «perfil») |
 | `--c-surface` | `#f4f5f3` | Fondo de secciones alternas (tono «aluminio anodizado») |
 | `--c-white` | `#ffffff` | Fondo base |
 | `--c-brand` | `#d7141a` | Rojo de marca: botón principal, acentos, marcador de sección |
-| `--c-brand-dark` | `#b00f14` | Hover del botón principal (contraste del texto blanco 6,4:1) |
-| `--c-blue` | `#0b4ea2` | Azul de marca: enlaces y foco (7,0:1) |
+| `--c-brand-dark` | `#b00f14` | Hover del botón principal (contraste del texto blanco 7,2:1) |
+| `--c-blue` | `#0b4ea2` | Azul de marca: enlaces y foco (8,0:1) |
 | `--c-blue-tint` | `#e8f0fa` | Fondos informativos |
 
-Criterio: todo texto cumple **WCAG AA** (4,5:1 o más). El blanco sobre `--c-brand` da 5,1:1.
+Criterio: todo texto cumple **WCAG AA** (4,5:1 o más). El blanco sobre `--c-brand` da 5,2:1. Ratios calculados con la fórmula WCAG 2.x y confirmados por la auditoría de accesibilidad de Lighthouse.
 
 ## Tipografía
 
@@ -52,7 +53,7 @@ Criterio: todo texto cumple **WCAG AA** (4,5:1 o más). El blanco sobre `--c-bra
 | Botón | `.btn`, `.btn--primary`, `.btn--ghost`, `.btn--light` | Altura mínima 48 px (objetivo táctil) |
 | Tarjeta de producto | `ProductCard.astro` | Imagen 16:9, título, subtítulo, flecha; toda la tarjeta clicable con un solo enlace |
 | Cabecera de página | `PageHero.astro` | Migas de pan, H1, entradilla |
-| Ficha de producto | `pages/[categoria]/[producto].astro` | Imagen, secciones de contenido, tabla de series, documentación PDF, relacionados, CTA |
+| Ficha de producto | `pages/[category]/[product].astro` | Imagen, secciones de contenido, tabla de series, documentación PDF, relacionados, CTA |
 | Tabla de series | `SeriesTable.astro` | Tabla real (`<table>`) con desplazamiento horizontal en móvil |
 | Lista de documentos | `DocumentList.astro` | Enlaces PDF con tamaño de tipo y aviso de que es documentación del fabricante |
 | Bloque CTA | `CtaBand.astro` | Banda oscura con teléfono y presupuesto |

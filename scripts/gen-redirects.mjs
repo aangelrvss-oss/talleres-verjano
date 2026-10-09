@@ -39,7 +39,7 @@ const escape = (s) => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 
 const htaccess = `# Generado por scripts/gen-redirects.mjs a partir de docs/redirect-map.csv. No editar a mano.
 Options -Indexes
-DirectoryIndex index.html index.php
+DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
 AddDefaultCharset UTF-8

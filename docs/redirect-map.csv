@@ -1,6 +1,5 @@
 old_url,new_url,status,notes
 /index.php,/,301,Portada antigua
-/index.html,/,301,Por si existe enlazada
 /01aluminio_sistemas_abatibles.html,/sistemas-aluminio/abatibles/,301,Ficha migrada
 /01aluminio_sistemas_corredera.html,/sistemas-aluminio/correderas/,301,Ficha migrada
 /01aluminio_sistemas_elevables.html,/sistemas-aluminio/elevables/,301,Ficha migrada
