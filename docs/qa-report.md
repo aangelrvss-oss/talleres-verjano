@@ -1,121 +1,87 @@
 # Informe de QA
 
-Fecha: 9 de octubre de 2026 · Rama: `claude/busy-gauss-k22go8` · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56)
+Última ejecución: 9 de octubre de 2026 · Rama `claude/busy-gauss-k22go8` · **v2 (rediseño visual)** · Astro 7.3.8 · Node 22 · Chromium (Playwright 1.56) · Apache 2.4 + PHP 8.3 locales.
 
-Solo se recogen pruebas **realmente ejecutadas**. Las limitaciones están al final.
+Solo se recogen pruebas **realmente ejecutadas**. Limitaciones al final.
 
-## 1. Resumen
+## 1. Resumen (v2)
 
 | Prueba | Resultado |
 |---|---|
-| `astro check` (TypeScript y plantillas) | 0 errores, 0 avisos, 0 sugerencias |
-| `npm run build` | 27 páginas HTML, 25 URL en el sitemap, 24 redirecciones; 3,0 MB en total (incluidas todas las variantes de imagen) |
-| `npm run check` (comprobaciones estáticas) | Superadas, sin avisos |
-| Playwright contra `astro preview` (formulario simulado) | **76 superadas**, 5 omitidas (solo aplican a escritorio o a Apache) |
-| Playwright contra Apache 2.4 + PHP 8.3 con el `.htaccess` real | **73 superadas**, 8 omitidas (casos simulados o solo de escritorio) |
-| Redirecciones de las 24 URL antiguas (curl contra Apache) | 24/24 → 301 directa y destino 200 (un solo salto) |
-| Endpoint PHP (curl) | 10/10 escenarios correctos (ver §4) |
-| Lighthouse 12 (móvil y escritorio, contra Apache local) | 100 en rendimiento, accesibilidad, buenas prácticas y SEO en todas las páginas medidas |
+| `astro check` | 0 errores, 0 avisos, 0 sugerencias |
+| `npm run build` | 27 páginas, 25 URL en el sitemap, 24 redirecciones |
+| `npm run check` (comprobaciones estáticas) | Superadas |
+| Playwright contra `astro preview` (formulario simulado), 3 perfiles | **91 superadas**, 8 omitidas (no aplican al perfil) |
+| Playwright contra Apache + PHP real (`.htaccess` y envío en modo de prueba) | **88 superadas**, 11 omitidas (casos simulados o de otro perfil) |
+| Redirecciones de las 24 URL antiguas (curl contra Apache) | 24/24: 301 → 200 en un solo salto |
+| Desbordamiento horizontal: 27 páginas × 7 anchos (320–1920 px) | 0 casos en 189 combinaciones; 0 errores de JavaScript |
+| Movimiento reducido (`reducedMotion: 'reduce'`) | 0 elementos ocultos y 0 animaciones en marcha |
+| Sin JavaScript | Todo el contenido visible; el catálogo es navegable |
+| Lighthouse 12 (Apache local, móvil y escritorio) | 100 / 100 / 100 / 100 en todas las páginas medidas (la 404 tiene 69 en SEO a propósito, por `noindex`) |
 | `npm audit` | 0 vulnerabilidades |
 
-## 2. Comprobaciones estáticas (`scripts/check-site.mjs`)
-
-Sobre las 27 páginas generadas:
-
-- Exactamente un `<h1>` por página.
-- `<title>` y meta description presentes, **únicos** y de longitud razonable (título de 20 a 70 caracteres; descripción de 70 a 165).
-- Canonical absoluto y coherente con la ruta; `lang="es"`; viewport que **permite** el zoom.
-- Todas las `<img>` con atributo `alt` (vacío solo en las imágenes decorativas de las tarjetas, cuyo enlace ya tiene texto).
-- Todos los enlaces internos, `src` y `srcset` apuntan a archivos existentes. Excepción documentada: `/archivos/…` (PDF que se conservan en el servidor).
-- JSON-LD válido, sin valoraciones, ofertas ni precios.
-- Sin texto de relleno (lorem ipsum, TODO, placeholder…).
-- Sitemap sin páginas `noindex`; todas sus URL existen.
-- Redirecciones: destinos existentes y sin cadenas.
-
-**Errores encontrados y corregidos durante la QA**: títulos de más de 70 caracteres (7 páginas), el logo sin texto alternativo útil, el enlace del teléfono sin nombre accesible en móvil (detectado por Lighthouse) y un falso positivo del propio comprobador (la palabra «todo» en español).
-
-## 3. Pruebas de navegador (Playwright)
-
-Perfiles: **escritorio** (1366 × 900), **móvil** (Pixel 7, táctil) y **tableta** (820 × 1180, táctil).
+## 2. Pruebas nuevas en la v2
 
 | Caso | Qué verifica |
 |---|---|
-| 13 páginas representativas | HTTP 200, un H1, cero errores de consola o JavaScript, imágenes cargadas (tras forzar la carga diferida), sin desbordamiento horizontal |
-| Todas las URL del sitemap (25) | Lo mismo para cada ficha, categoría y página corporativa |
-| URL inexistente | HTTP 404, página útil con enlaces y `noindex` |
-| Menú | En móvil y tableta, botón de menú con `aria-expanded`; se llega a «Muro cortina» desde el desplegable |
-| Teclado (escritorio) | El enlace «Saltar al contenido» es el primer foco y lleva a `#contenido`; el desplegable se abre con Enter, se cierra con Escape y devuelve el foco al botón |
-| Migas de pan | Enlazan a la categoría |
-| Enlaces de contacto | `tel:+34913038775`, `tel:+34635304043`, `mailto:info@…` y `mailto:clientes@…` |
-| Mapa | No hay iframe de Google hasta pulsar «Mostrar mapa» |
-| Preselección | «Pedir presupuesto» en una ficha abre el formulario con el producto seleccionado |
-| Validación | Envío vacío: resumen de errores con foco, `aria-invalid`, mensajes por campo y **ninguna petición** al servidor; email con formato incorrecto |
-| Error del servidor (500) | Se muestra un error con alternativas; **no** se muestra el éxito |
-| Respuesta no JSON (alojamiento sin PHP) | Se trata como error; **no** se muestra el éxito |
-| Envío correcto | Estado «Enviando…», confirmación del servidor, mensaje de éxito con foco |
-| SEO | Título, canonical, `og:image` absoluta y `BreadcrumbList` |
-| Redirección (solo Apache) | `/01aluminio_sistemas_abatibles.html` → 301 → `/sistemas-aluminio/abatibles/` |
+| Mega menú «Productos» (3 perfiles) | Se abre y muestra las 3 categorías y las 15 fichas; desde él se llega a «Muro cortina» |
+| Mega menú en escritorio | Se abre con hover; un clic justo después no lo cierra; se cierra al salir el ratón; con teclado: Enter abre, Tab entra en el panel, Escape cierra y devuelve el foco |
+| Menú móvil | Panel visible, se cierra con Escape (el foco vuelve al botón) y al pulsar el fondo |
+| Conmutador de categorías | La categoría actual lleva `aria-current="page"` |
+| Ficha | El índice marca la sección activa (`aria-current`) al saltar a «Documentación»; «Siguiente» lleva a la ficha siguiente |
+| Aparición al hacer scroll | Los bloques reciben `.is-in` y llegan a opacidad 1 |
+| Movimiento reducido | Ningún `[data-reveal]` queda oculto |
+| Sin JavaScript | Ningún `[data-reveal]` queda oculto y las tarjetas se ven |
+| Barra de contacto móvil | Oculta al cargar, visible tras desplazarse, con `tel:` correcto, y oculta cuando el formulario está en pantalla |
+| Formulario | El botón pasa a `aria-busy="true"` (indicador de carga) durante el envío |
 
-En la ejecución contra Apache + PHP, el envío correcto recorre el flujo real (navegador → `contacto.php` → «correo») con `TV_FORM_DRY_RUN=1`: el mensaje se escribió en el registro de prueba en lugar de enviarse. **No se ha enviado ningún correo a la empresa.**
+Se mantienen todas las pruebas de la v1: 13 páginas representativas y las 25 URL del sitemap (HTTP 200, un H1, sin errores de consola, imágenes visibles cargadas, sin desbordamiento), 404, migas de pan, `tel:`/`mailto:`, mapa bajo demanda, preselección del producto, validación, error del servidor, respuesta no JSON, envío correcto y SEO.
 
-### Anchos de pantalla
+## 3. Lighthouse 12 (v2)
 
-Script adicional (Chromium) sobre 12 páginas a **320, 375, 768, 1024, 1280, 1440 y 1920 px**: sin desbordamiento horizontal. Al principio había un desbordamiento de 10 px en la cabecera a 1440 px (el botón «Pedir presupuesto» se partía en dos líneas); se corrigió antes de esta medición.
+Puntuaciones en el orden rendimiento / accesibilidad / buenas prácticas / SEO. Medición contra Apache local: no hay latencia de red real, aunque Lighthouse simula la conexión móvil.
 
-### Revisión visual
+| Página | Móvil | LCP móvil | Escritorio | LCP escr. | CLS | Peso |
+|---|---|---|---|---|---|---|
+| `/` | 100 / 100 / 100 / 100 | 1,6 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 165 KiB |
+| `/sistemas-aluminio/` | 100 / 100 / 100 / 100 | 1,9 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 207 KiB |
+| `/sistemas-aluminio/abatibles/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 101 KiB |
+| `/otros-productos/toldos-pergolas/` | 100 / 100 / 100 / 100 | 1,4 s | — | — | 0 | — |
+| `/contacto/` | 100 / 100 / 100 / 100 | 1,2 s | 100 / 100 / 100 / 100 | 0,3 s | 0 | 66 KiB |
+| `/empresa/` | 100 / 100 / 100 / 100 | 1,4 s | 100 / 100 / 100 / 100 | 0,5 s | 0,013 | 110 KiB |
+| `/consejos/rotura-puente-termico/` | 100 / 100 / 100 / 100 | 1,3 s | 100 / 100 / 100 / 100 | 0,4 s | 0 | 96 KiB |
+| `/404.html` | 100 / 100 / 100 / 69 | 1,1 s | — | — | 0,001 | 59 KiB |
 
-Capturas revisadas en escritorio (1366 y 1440) y móvil (390): portada, ficha de abatibles, contacto con errores de validación, menú móvil abierto, desplegable de escritorio y página de empresa. Ajustes aplicados: separación visual entre la banda de contacto y el pie, texto del selector recortado, estilo de la ayuda del formulario y columna lateral de las fichas no fija (con muchos PDF superaba la altura de la pantalla).
+TBT de 0 ms en todas. El peso de la portada sube de 123 a 165 KiB por la foto de alta resolución del hero; sigue dentro de márgenes excelentes.
 
-## 4. Endpoint PHP (curl contra `php -S` y Apache)
+**Defectos encontrados y corregidos en la QA de la v2**
 
-| Escenario | Resultado esperado | Obtenido |
-|---|---|---|
-| GET | 405 | 405 |
-| POST con campos inválidos (JSON) | 422 con errores por campo | Correcto |
-| POST válido (JSON) | `{"ok":true}` y mensaje generado | Correcto |
-| Intento de inyección de cabeceras (`\r\nBcc:` en el nombre) | Neutralizado en una sola línea | Correcto (el asunto quedó en una línea; sin cabecera Bcc) |
-| Campo trampa relleno | Éxito aparente, sin envío | Correcto |
-| POST válido sin JavaScript | 303 → `/contacto/enviado/` | Correcto |
-| POST inválido sin JavaScript | 422 con página de error en HTML | Correcto |
-| Más de 5 envíos por hora desde una IP | 429 | Correcto |
-| Fallo de envío (registro sin permiso de escritura en Apache) | 500 con error; **sin** éxito falso | Correcto (detectado de forma fortuita: el cliente mostró el error) |
-| Acceso a `/api/.htaccess` | 403 | 403 |
+1. El mega menú no se abría con un clic de ratón: el hover lo abría y el clic lo cerraba. Se ignora el clic durante 500 ms tras abrirse por hover.
+2. El enlace del teléfono de la cabecera perdía su nombre accesible cuando se ocultaba el texto (detectado por Lighthouse). El texto pasa a estar oculto solo visualmente.
+3. El enlace «volver a la categoría» del índice de la ficha, en móvil, no tenía nombre accesible. Se le añade `aria-label`.
+4. El anillo de foco azul tenía un contraste de unos 2,4:1 sobre los fondos oscuros. Ahora es blanco en las zonas oscuras y rojas.
+5. En móvil, el texto de las tarjetas de categoría quedaba sobre zonas claras de la foto. Se oscurece más el degradado.
+6. En móvil, la etiqueta «Imagen ilustrativa» del hero quedaba tapada por un dato flotante. Se recoloca.
+7. En móvil, las tarjetas de contacto se solapaban con la entradilla de la cabecera. Se elimina el margen negativo en móvil.
+8. El índice de la ficha mantenía resaltada la última sección al volver arriba. Se calcula por posición de scroll.
+9. Texto no verificable: «Sistemas más consultados» pasa a «Sistemas destacados del catálogo».
 
-## 5. Apache y `.htaccess`
+## 4. Revisión visual
 
-Apache 2.4 + mod_php 8.3 local, `AllowOverride All`:
+Capturas a página completa y revisadas en escritorio (1440 px) y móvil (iPhone 13, 390 px): portada, «Sistemas en aluminio», ficha de abatibles, contacto, empresa y guía de RPT. También se revisaron el mega menú abierto, el menú móvil (cerrado, abierto y con «Productos» desplegado), la barra móvil y la portada con movimiento reducido.
 
-- 24 URL antiguas: 301 directa al destino nuevo (un salto); destino 200.
-- `/no-existe.html`: 404 con la página 404 de la web.
-- Cabeceras: `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`; `/_astro/*` con `Cache-Control: public, max-age=31536000, immutable`; HTML comprimido con gzip (8,6 KB la portada).
-- **Fallo detectado y corregido**: la regla `/index.html → /` creaba un bucle de redirección en la portada (mod_dir sirve `/` internamente como `/index.html`). Se eliminó del mapa.
+## 5. Endpoint PHP y Apache (v1, sin cambios en la v2)
 
-## 6. Lighthouse 12
+- `contacto.php`: 10/10 escenarios correctos (GET 405, errores 422 por campo, éxito, inyección de cabeceras neutralizada, campo trampa, flujo sin JavaScript con 303 o página de error, límite 429 y fallo de envío sin éxito falso).
+- `.htaccess`: 404 real, cabeceras de seguridad, caché inmutable en `/_astro/`, gzip y `/api/` protegido. El bucle de redirección de la portada se corrigió en la v1.
 
-Contra Apache local (sin latencia de red real, aunque Lighthouse simula la conexión móvil). Puntuaciones: rendimiento / accesibilidad / buenas prácticas / SEO.
+## 6. Limitaciones y pendientes
 
-| Página | Móvil | LCP móvil | CLS | Escritorio | Peso |
-|---|---|---|---|---|---|
-| `/` | 100 / 100 / 100 / 100 | 1,4 s | 0,001 | 100 / 100 / 100 / 100 | 123 KiB |
-| `/sistemas-aluminio/abatibles/` | 100 / 100 / 100 / 100 | 1,4 s | 0,001 | 100 / 100 / 100 / 100 | 96 KiB |
-| `/contacto/` | 100 / 100 / 100 / 100 | 1,2 s | 0 | 100 / 100 / 100 / 100 | 62 KiB |
-| `/materiales-adicionales/` | 100 / 100 / 100 / 100 | 1,6 s | 0 | 100 / 100 / 100 / 100 | 155 KiB |
-| `/otros-productos/hierro-forja/` | 100 / 100 / 100 / 100 | 1,5 s | 0,001 | 100 / 100 / 100 / 100 | 86 KiB |
-| `/sistemas-aluminio/muro-cortina/`, `/consejos/rotura-puente-termico/`, `/empresa/` (solo móvil) | 100 / 100 / 100 / 100 | — | — | — | — |
-| `/404.html` | 100 / 100 / 100 / **69** | 1,4 s | 0,002 | 100 / 100 / 100 / 69 | 56 KiB |
-
-El 69 de SEO de la 404 es esperado: devuelve 404 y lleva `noindex`.
-
-## 7. Contrastes
-
-Ratios WCAG calculados para los tokens de color: todos ≥ 4,5:1 (texto secundario 9,1:1, texto atenuado 5,8:1, enlaces 8,0:1, botón principal 5,2:1). Lighthouse no detecta problemas de contraste.
-
-## 8. Limitaciones y pendientes
-
-- **Navegadores**: solo se ha probado con Chromium. Firefox y Safari/WebKit no están disponibles en el entorno. El código usa CSS y JavaScript estándar sin funciones experimentales, pero conviene una revisión manual en Safari (iOS) antes del lanzamiento.
-- **Lectores de pantalla**: no se ha hecho una prueba manual con NVDA o VoiceOver; sí las comprobaciones automáticas de Lighthouse y la estructura ARIA cubierta por las pruebas.
-- **Correo real**: `mail()` no se ha probado en el alojamiento de producción (no hay acceso). Hay que verificarlo en la vista previa con un buzón de pruebas (README, «Despliegue»).
-- **PDF**: no se han copiado al repositorio; se verificó (HTTP 200) que existen los 17 en el servidor actual el 9/10/2026.
-- **Rendimiento real**: Lighthouse se ejecutó en local. Tras publicar, hay que medir con PageSpeed Insights sobre el dominio real.
-- **Rastreo de la web antigua**: limitado a lo enlazado y a lo indexado (no hay acceso a Search Console). Pueden existir URL antiguas con tráfico que no estén en el mapa de redirecciones; se recomienda revisar el informe de páginas de Search Console tras el lanzamiento.
-- **Contenido pendiente de confirmar**: ver `README.md`, «Pendientes del propietario».
+- **Navegadores**: solo Chromium. Las View Transitions entre páginas son una mejora progresiva (Chromium y Safari recientes); en Firefox se navega sin transición. Conviene una revisión manual en Safari (iOS).
+- **Lectores de pantalla**: sin prueba manual con NVDA o VoiceOver (sí con Lighthouse y con las pruebas de foco, ARIA y teclado).
+- **Correo real**: `mail()` no se ha probado en el alojamiento de producción.
+- **Imágenes**:
+  - Las 15 fotos de producto miden 765 × 374 px; en las cabeceras de ficha se ven algo blandas en pantallas retina. Se recomienda sustituirlas por originales de mayor tamaño o fotografías propias.
+  - Las 2 fotos de Unsplash se recortaron de capturas; conviene descargar los originales (ver `image-credits.md`).
+- **Rendimiento real**: Lighthouse se ejecutó en local. Tras publicar, hay que medir con PageSpeed Insights.
+- **Datos pendientes** (horario, antigüedad, financiación, garantía de lonas, WhatsApp, razón social y NIF): ocultos o retirados hasta su confirmación (`README.md`).

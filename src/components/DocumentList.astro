@@ -36,7 +36,8 @@ const { documents } = Astro.props;
     gap: var(--s-3);
   }
   h2 {
-    font-size: var(--fs-lg);
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+    letter-spacing: -0.02em;
   }
   .docs__note {
     font-size: var(--fs-sm);
@@ -45,26 +46,33 @@ const { documents } = Astro.props;
   ul {
     list-style: none;
     display: grid;
-    gap: var(--s-2);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--s-3);
+    margin-top: var(--s-2);
   }
   a {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: var(--s-3);
-    padding: 0.7rem var(--s-4);
+    min-height: 3.75rem;
+    padding: 0.75rem var(--s-4);
     border: 1px solid var(--c-line);
-    border-radius: var(--radius);
+    border-radius: 10px;
     background: var(--c-white);
     color: var(--c-ink);
-    font-weight: 650;
+    font-weight: 700;
     font-size: var(--fs-sm);
     text-decoration: none;
-    transition: border-color 0.15s var(--ease);
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.3s var(--ease-out),
+      transform 0.3s var(--ease-out);
   }
   a:hover {
-    border-color: var(--c-blue);
-    color: var(--c-blue);
+    border-color: var(--c-ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
   a :global(svg) {
     color: var(--c-brand);

@@ -25,20 +25,27 @@ const breadcrumbs = [
 ---
 
 <Base title={guide.metaTitle} description={guide.metaDescription} ogImage={related[0]?.image} breadcrumbs={breadcrumbs}>
-  <PageHero title={guide.title} eyebrow="Consejos" lead={guide.excerpt} breadcrumbs={breadcrumbs} />
+  <PageHero
+    title={guide.title}
+    eyebrow="Consejos"
+    lead={guide.excerpt}
+    breadcrumbs={breadcrumbs}
+    image={related[0]?.image}
+    imageCaption="Imagen ilustrativa."
+  />
   <article class="section">
-    <div class="container narrow">
+    <div class="container narrow" data-reveal>
       <Sections sections={guide.sections} />
     </div>
   </article>
   <section class="section section--surface" aria-labelledby="rel-title">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head" data-reveal>
         <p class="eyebrow">Productos</p>
-        <h2 id="rel-title">Productos relacionados con esta guía</h2>
+        <h2 id="rel-title" class="h-xl">Productos relacionados con esta guía</h2>
       </div>
       <div class="grid grid--4">
-        {related.map((p) => <ProductCard product={p} />)}
+        {related.map((p, i) => <ProductCard product={p} showCategory delay={i} />)}
       </div>
     </div>
   </section>

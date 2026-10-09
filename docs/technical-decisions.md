@@ -96,3 +96,16 @@ No se han podido copiar al repositorio (dominio bloqueado desde el entorno de de
 | @playwright/test, @astrojs/check, typescript | Pruebas y tipos | Desarrollo |
 
 El sitio publicado no carga ninguna librería de terceros en el navegador.
+
+## 11. Rediseño v2: decisiones técnicas
+
+- **Sin dependencias nuevas.** Todo el movimiento usa CSS nativo y unas 15 líneas de JavaScript en línea (IntersectionObserver). No se han añadido GSAP, AOS, Framer Motion ni otras librerías.
+- **View Transitions entre documentos** (`@view-transition { navigation: auto; }`). Mejora progresiva: Chromium y Safari reciente las animan; el resto navega con normalidad. La cabecera tiene `view-transition-name` para no parpadear.
+- **Aparición al hacer scroll segura**: los elementos `[data-reveal]` solo se ocultan si `<html>` tiene la clase `.js` (la añade un script en línea en `<head>`) y el usuario no pide movimiento reducido. El observador también va en línea al final del `<body>`, de modo que no depende de la carga de un módulo. Sin `IntersectionObserver`, todo se muestra.
+- **Sin animación de opacidad en la imagen LCP**: la imagen del hero solo hace una animación de escala, para no retrasar el LCP (1,4 s en móvil según Lighthouse).
+- **Mega menú**: un solo panel con los 18 enlaces del catálogo en el HTML (buenos enlaces internos). Se abre con hover (solo en dispositivos con ratón), clic y teclado, y se cierra con Escape, clic fuera o pérdida de foco. Sin JavaScript se abre con `:hover`.
+- **Panel móvil**: en móvil se quita el `backdrop-filter` de la barra, porque crearía un bloque contenedor y descolocaría el panel `position: fixed`.
+- **Barra de contacto móvil**: se oculta con `visibility` cuando no está a la vista (no recibe el foco con el tabulador) y cuando el formulario está en pantalla.
+- **Índice de la ficha**: el resaltado de la sección activa se calcula por posición de scroll con `requestAnimationFrame` (más fiable que IntersectionObserver para secciones de alturas muy distintas).
+- **Datos pendientes ocultos por indicadores** (`foundingYearConfirmed`, `hours.confirmed`) en `site.ts`, en lugar de mostrarlos con avisos.
+- **Imágenes de stock**: dos fotos de Unsplash de alta resolución para el hero y las cabeceras (ver `image-credits.md`). Se recortaron de capturas de página porque el dominio de imágenes de Unsplash está bloqueado desde el entorno de desarrollo; conviene sustituirlas por los originales antes de publicar.

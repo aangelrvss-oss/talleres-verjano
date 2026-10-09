@@ -1,0 +1,98 @@
+---
+/**
+ * Barra de contacto fija en móvil: aparece tras desplazarse un poco y se
+ * oculta cuando el formulario de presupuesto está en pantalla, para no tapar
+ * contenido. El pie reserva su altura en móvil (ver Footer).
+ */
+import Icon from './Icon.astro';
+import { primaryPhone } from '../data/site';
+---
+
+<div class="mbar" data-mbar aria-label="Contacto rápido" role="region">
+  <a class="mbar__btn mbar__btn--call" href={primaryPhone.href}>
+    <Icon name="phone" size={20} />
+    <span>Llamar</span>
+  </a>
+  <a class="mbar__btn mbar__btn--quote" href="/contacto/#presupuesto">
+    <span>Pedir presupuesto</span>
+    <Icon name="arrow" size={18} />
+  </a>
+</div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-mbar]');
+  const form = document.getElementById('presupuesto');
+  let formVisible = false;
+  const update = () => {
+    bar?.classList.toggle('is-visible', window.scrollY > 320 && !formVisible);
+  };
+  if (form && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      formVisible = e.isIntersecting;
+      update();
+    }).observe(form);
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+</script>
+
+<style>
+  .mbar {
+    display: none;
+  }
+  @media (max-width: 47.99rem) {
+    .mbar {
+      position: fixed;
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+      z-index: 45;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+      padding: 0.4rem;
+      background: rgb(13 22 32 / 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(calc(100% + 1.5rem));
+      visibility: hidden;
+      transition:
+        transform 0.4s var(--ease-out),
+        visibility 0s linear 0.4s;
+    }
+    .mbar.is-visible {
+      transform: none;
+      visibility: visible;
+      transition:
+        transform 0.4s var(--ease-out),
+        visibility 0s;
+    }
+    .mbar__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 3rem;
+      padding: 0 1.1rem;
+      border-radius: 10px;
+      font-weight: 750;
+      font-size: var(--fs-sm);
+      text-decoration: none;
+    }
+    .mbar__btn--call {
+      color: var(--c-white);
+      background: rgb(255 255 255 / 0.1);
+    }
+    .mbar__btn--quote {
+      color: var(--c-white);
+      background: var(--c-brand);
+    }
+  }
+  @media (max-width: 47.99rem) and (prefers-reduced-motion: reduce) {
+    .mbar {
+      transition: none;
+    }
+  }
+</style>

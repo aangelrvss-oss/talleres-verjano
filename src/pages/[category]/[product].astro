@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ProductCard from '../../components/ProductCard.astro';
@@ -8,7 +7,7 @@ import SeriesTable from '../../components/SeriesTable.astro';
 import DocumentList from '../../components/DocumentList.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
-import { products, getCategory, getProduct, productUrl, categoryUrl, type Product } from '../../data/catalog';
+import { products, productsIn, getCategory, getProduct, productUrl, categoryUrl, type Product } from '../../data/catalog';
 import { primaryPhone } from '../../data/site';
 
 export function getStaticPaths() {
@@ -25,12 +24,23 @@ interface Props {
 const { product } = Astro.props;
 const category = getCategory(product.category);
 const related = product.related.map((s) => getProduct(s)).filter((p): p is Product => Boolean(p));
+const siblings = productsIn(product.category);
+const idx = siblings.findIndex((p) => p.slug === product.slug);
+const prev = siblings[(idx - 1 + siblings.length) % siblings.length];
+const next = siblings[(idx + 1) % siblings.length];
 const quoteHref = `/contacto/?producto=${product.slug}#presupuesto`;
 
 const breadcrumbs = [
   { name: 'Inicio', href: '/' },
   { name: category.name, href: categoryUrl(category.slug) },
   { name: product.name, href: productUrl(product) },
+];
+
+const toc = [
+  { id: 'descripcion', label: 'Descripción' },
+  ...(product.series ? [{ id: 'series', label: 'Series' }] : []),
+  ...(product.documents ? [{ id: 'documentacion', label: 'Documentación' }] : []),
+  ...(related.length ? [{ id: 'relacionados', label: 'Relacionados' }] : []),
 ];
 
 const webPage = {
@@ -44,87 +54,146 @@ const webPage = {
 ---
 
 <Base title={product.metaTitle} description={product.metaDescription} ogImage={product.image} breadcrumbs={breadcrumbs} jsonLd={[webPage]}>
-  <PageHero title={product.name} eyebrow={category.name} lead={product.intro} breadcrumbs={breadcrumbs} />
+  <PageHero
+    title={product.name}
+    eyebrow={category.name}
+    lead={product.intro}
+    breadcrumbs={breadcrumbs}
+    image={product.image}
+    imageAlt={product.imageAlt}
+    imageCaption="Imagen ilustrativa del producto."
+  >
+    <div class="hero-actions">
+      <a class="btn btn--primary btn--lg" href={quoteHref}>
+        Pedir presupuesto <Icon name="arrow" size={18} class="btn__arrow" />
+      </a>
+      <a class="btn btn--outline-light btn--lg" href={primaryPhone.href}>
+        <Icon name="phone" size={18} />
+        {primaryPhone.display}
+      </a>
+    </div>
+  </PageHero>
 
-  <div class="section">
+  {
+    toc.length > 1 && (
+      <nav class="toc" aria-label="En esta ficha" data-toc>
+        <div class="container toc__inner">
+          <a class="toc__back" href={categoryUrl(category.slug)} aria-label={`Volver a ${category.name.toLowerCase()}`}>
+            <Icon name="arrow-left" size={16} />
+            <span>{category.name}</span>
+          </a>
+          <ul>
+            {toc.map((t) => (
+              <li>
+                <a href={`#${t.id}`} data-toc-link={t.id}>
+                  {t.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="toc__cta" href={quoteHref}>
+            Presupuesto
+          </a>
+        </div>
+      </nav>
+    )
+  }
+
+  <div class="section product-body">
     <div class="container product">
       <article class="product__main">
-        <figure class="product__figure">
-          <Image
-            src={product.image}
-            alt={product.imageAlt}
-            widths={[480, 765]}
-            sizes="(max-width: 62rem) 100vw, 760px"
-            loading="eager"
-            fetchpriority="high"
-          />
-          <figcaption>Imagen ilustrativa del producto.</figcaption>
-        </figure>
-
-        <p class="product__tagline">{product.tagline}</p>
-
-        <ul class="product__highlights" aria-label="Características principales">
-          {
-            product.highlights.map((h) => (
-              <li>
-                <Icon name="check" size={18} />
-                {h}
-              </li>
-            ))
-          }
-        </ul>
-
-        <Sections sections={product.sections} />
+        <section id="descripcion" class="product__section" aria-labelledby="desc-title">
+          <h2 id="desc-title" class="visually-hidden">Descripción</h2>
+          <p class="product__tagline" data-reveal>{product.tagline}</p>
+          <ul class="product__highlights" aria-label="Características principales">
+            {
+              product.highlights.map((h, i) => (
+                <li data-reveal style={`--d:${i}`}>
+                  <span class="product__check">
+                    <Icon name="check" size={16} />
+                  </span>
+                  {h}
+                </li>
+              ))
+            }
+          </ul>
+          <div data-reveal>
+            <Sections sections={product.sections} />
+          </div>
+        </section>
 
         {
           product.series && (
-            <div class="product__series">
+            <section id="series" class="product__section" aria-label="Series" data-reveal>
               <SeriesTable series={product.series} />
-            </div>
+            </section>
           )
         }
+
+        {
+          product.documents && (
+            <section id="documentacion" class="product__section" data-reveal>
+              <DocumentList documents={product.documents} />
+            </section>
+          )
+        }
+
+        <nav class="pager" aria-label={`Otras fichas de ${category.name.toLowerCase()}`}>
+          <a class="pager__link" href={productUrl(prev)} rel="prev">
+            <span class="pager__dir"><Icon name="arrow-left" size={16} /> Anterior</span>
+            <span class="pager__name">{prev.name}</span>
+          </a>
+          <a class="pager__link pager__link--next" href={productUrl(next)} rel="next">
+            <span class="pager__dir">Siguiente <Icon name="arrow" size={16} /></span>
+            <span class="pager__name">{next.name}</span>
+          </a>
+        </nav>
       </article>
 
-      <aside class="product__aside" aria-label="Presupuesto y documentación">
+      <aside class="product__aside" aria-label="Presupuesto">
         <div class="quote-card">
           <p class="quote-card__title">¿Le interesa {product.name.toLowerCase()}?</p>
           <p>Cuéntenos medidas y necesidades y le preparamos un presupuesto sin compromiso.</p>
-          <a class="btn btn--primary" href={quoteHref}>Pedir presupuesto</a>
-          <a class="btn btn--ghost" href={primaryPhone.href}>
+          <a class="btn btn--primary btn--block" href={quoteHref}>
+            Pedir presupuesto <Icon name="arrow" size={16} class="btn__arrow" />
+          </a>
+          <a class="quote-card__phone" href={primaryPhone.href}>
             <Icon name="phone" size={18} />
             {primaryPhone.display}
           </a>
+          {
+            product.brands && (
+              <div class="quote-card__brands">
+                <p>Fabricantes</p>
+                <ul>
+                  {product.brands.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
         </div>
-
-        {product.documents && <DocumentList documents={product.documents} />}
-
-        {
-          product.brands && (
-            <div class="brands-box">
-              <p class="brands-box__title">Fabricantes</p>
-              <ul>
-                {product.brands.map((b) => (
-                  <li>{b}</li>
-                ))}
-              </ul>
-            </div>
-          )
-        }
       </aside>
     </div>
   </div>
 
   {
     related.length > 0 && (
-      <section class="section section--surface" aria-labelledby="relacionados-title">
+      <section id="relacionados" class="section section--surface" aria-labelledby="relacionados-title">
         <div class="container">
-          <div class="section-head">
-            <p class="eyebrow">Complementos</p>
-            <h2 id="relacionados-title">Productos relacionados</h2>
+          <div class="section-head section-head--row">
+            <div data-reveal>
+              <p class="eyebrow">Complementos</p>
+              <h2 id="relacionados-title" class="h-xl">Productos relacionados</h2>
+            </div>
+            <a class="link-arrow" href={categoryUrl(category.slug)} data-reveal>
+              Ver {category.name.toLowerCase()} <Icon name="arrow" size={18} />
+            </a>
           </div>
           <div class="grid grid--4">
-            {related.map((p) => (
-              <ProductCard product={p} />
+            {related.map((p, i) => (
+              <ProductCard product={p} showCategory delay={i} />
             ))}
           </div>
         </div>
@@ -132,41 +201,138 @@ const webPage = {
     )
   }
 
-  <CtaBand />
+  <CtaBand title={`Presupuesto de ${product.name.toLowerCase()}`} href={quoteHref} />
 </Base>
 
+<script>
+  // Resalta en el índice la sección que se está leyendo (scrollspy)
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  const sections = links.map((a) => document.getElementById(a.dataset.tocLink!)).filter((el): el is HTMLElement => Boolean(el));
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const line = window.innerHeight * 0.4;
+    let active: string | null = null;
+    for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
+    links.forEach((a) => (a.dataset.tocLink === active ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+  };
+  if (links.length) {
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    update();
+  }
+</script>
+
 <style>
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-2);
+  }
+
+  /* Índice de la ficha */
+  .toc {
+    position: sticky;
+    top: calc(var(--header-h) - 1px);
+    z-index: 30;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .toc__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    min-height: 3.5rem;
+  }
+  .toc__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex: none;
+    padding-right: var(--s-5);
+    border-right: 1px solid var(--c-line);
+    color: var(--c-ink-soft);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .toc__back:hover {
+    color: var(--c-blue);
+  }
+  .toc ul {
+    display: flex;
+    gap: var(--s-1);
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .toc ul::-webkit-scrollbar {
+    display: none;
+  }
+  .toc ul a {
+    display: block;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    color: var(--c-ink-soft);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+  .toc ul a:hover {
+    background: var(--c-surface);
+    color: var(--c-ink);
+  }
+  .toc ul a[aria-current] {
+    background: var(--c-ink);
+    color: var(--c-white);
+  }
+  .toc__cta {
+    margin-left: auto;
+    flex: none;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    background: var(--c-brand);
+    color: var(--c-white);
+    font-size: var(--fs-sm);
+    font-weight: 750;
+    text-decoration: none;
+  }
+  .toc__cta:hover {
+    background: var(--c-brand-dark);
+  }
+
+  /* Cuerpo */
   .product {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 20rem;
-    gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) 21rem;
+    gap: clamp(2rem, 5vw, 5rem);
   }
   .product__main {
     display: grid;
-    gap: var(--s-6);
+    gap: var(--s-8);
     min-width: 0;
   }
-  .product__figure {
-    margin: 0;
+  .product__section {
     display: grid;
-    gap: var(--s-2);
-  }
-  .product__figure img {
-    width: 100%;
-    aspect-ratio: 765 / 374;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-  }
-  .product__figure figcaption {
-    font-size: var(--fs-xs);
-    color: var(--c-muted);
+    gap: var(--s-6);
+    scroll-margin-top: calc(var(--header-h) + 5rem);
   }
   .product__tagline {
-    font-size: var(--fs-2xl);
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
     font-weight: 800;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
     color: var(--c-ink);
     padding-left: var(--s-5);
     border-left: 4px solid var(--c-brand);
@@ -179,80 +345,167 @@ const webPage = {
   }
   .product__highlights li {
     display: flex;
-    gap: var(--s-2);
-    align-items: flex-start;
-    padding: var(--s-3) var(--s-4);
+    gap: var(--s-3);
+    align-items: center;
+    padding: var(--s-4);
     background: var(--c-surface);
-    border-radius: var(--radius);
-    font-weight: 650;
+    border-radius: 10px;
+    font-weight: 700;
     font-size: var(--fs-sm);
   }
-  .product__highlights :global(svg) {
+  .product__check {
+    display: inline-grid;
+    place-items: center;
     flex: none;
-    margin-top: 0.15rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--c-success-tint);
     color: var(--c-success);
   }
-  .product__series {
-    margin-top: var(--s-2);
+
+  .pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--c-line);
+  }
+  .pager__link {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--c-line);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--c-ink);
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.3s var(--ease-out),
+      transform 0.3s var(--ease-out);
+  }
+  .pager__link:hover {
+    border-color: var(--c-ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .pager__link--next {
+    text-align: right;
+  }
+  .pager__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .pager__link--next .pager__dir {
+    justify-content: flex-end;
+  }
+  .pager__name {
+    font-weight: 800;
+    font-size: var(--fs-lg);
   }
 
-  .product__aside {
-    display: grid;
-    gap: var(--s-6);
-  }
+  /* Lateral */
   .quote-card {
+    position: sticky;
+    top: calc(var(--header-h) + 5rem);
     display: grid;
     gap: var(--s-3);
-    padding: var(--s-5);
+    padding: var(--s-6) var(--s-5);
     background: var(--c-ink);
     color: #c9d2dc;
-    border-radius: var(--radius-lg);
+    border-radius: 14px;
     font-size: var(--fs-sm);
+    box-shadow: var(--shadow-lg);
   }
   .quote-card__title {
     color: var(--c-white);
-    font-size: var(--fs-lg);
+    font-size: var(--fs-xl);
     font-weight: 800;
-    line-height: 1.25;
+    line-height: 1.2;
   }
-  .quote-card .btn--ghost {
-    --btn-fg: var(--c-white);
-    --btn-border: rgb(255 255 255 / 0.4);
+  .quote-card__phone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    min-height: 3rem;
+    border: 1.5px solid rgb(255 255 255 / 0.3);
+    border-radius: var(--radius);
+    color: var(--c-white);
+    font-weight: 750;
+    text-decoration: none;
   }
-  .quote-card .btn--ghost:hover {
-    background: rgb(255 255 255 / 0.08);
-    --btn-border: var(--c-white);
+  .quote-card__phone:hover {
+    border-color: var(--c-white);
   }
-  .brands-box {
+  .quote-card__brands {
     display: grid;
     gap: var(--s-2);
-    font-size: var(--fs-sm);
+    margin-top: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: 1px solid rgb(255 255 255 / 0.14);
   }
-  .brands-box__title {
-    font-weight: 750;
+  .quote-card__brands p {
+    font-weight: 700;
+    color: var(--c-white);
   }
-  .brands-box ul {
+  .quote-card__brands ul {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-2);
   }
-  .brands-box li {
-    padding: 0.3rem 0.7rem;
-    border: 1px solid var(--c-line-strong);
+  .quote-card__brands li {
+    padding: 0.25rem 0.7rem;
+    border: 1px solid rgb(255 255 255 / 0.3);
     border-radius: 999px;
     font-weight: 650;
-    color: var(--c-ink-soft);
   }
 
   @media (max-width: 62rem) {
     .product {
       grid-template-columns: 1fr;
     }
+    .quote-card {
+      position: static;
+    }
+    .toc__cta {
+      display: none;
+    }
   }
-  @media (max-width: 34rem) {
-    .product__highlights {
+  @media (max-width: 68.74rem) {
+    .toc {
+      top: calc(4rem - 1px);
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .toc__back span {
+      display: none;
+    }
+    .toc__back {
+      padding-right: var(--s-3);
+    }
+    .toc__inner {
+      gap: var(--s-3);
+    }
+    .product__highlights,
+    .pager {
       grid-template-columns: 1fr;
+    }
+    .pager__link--next {
+      text-align: left;
+    }
+    .pager__link--next .pager__dir {
+      justify-content: flex-start;
+    }
+    .hero-actions .btn {
+      flex: 1 1 100%;
     }
   }
 </style>

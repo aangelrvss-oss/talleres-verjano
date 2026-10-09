@@ -10,10 +10,16 @@
 export const site = {
   name: 'Talleres Verjano',
   legalName: null as string | null, // Pendiente: razón social y CIF para el aviso legal
-  tagline: 'Carpintería de aluminio en Madrid desde 1968',
+  tagline: 'Carpintería de aluminio en Madrid',
   description:
     'Fabricación e instalación de ventanas, puertas y cerramientos de aluminio en Madrid. Sistemas abatibles, correderos y elevables, muro cortina, acristalamientos, persianas y protección solar.',
-  foundingYear: 1968, // Fuente: web actual («Contigo desde 1968»). Facebook dice «más de 30 años»: pendiente de confirmación.
+  /**
+   * Fuente: web actual («Contigo desde 1968», «más de 50 años»). Facebook dice
+   * «más de 30 años»: PENDIENTE de confirmar. Mientras `foundingYearConfirmed`
+   * sea false, la web no muestra el año ni la antigüedad.
+   */
+  foundingYear: 1968,
+  foundingYearConfirmed: false,
 
   address: {
     street: 'C/ Cerámica, 25',
@@ -41,14 +47,15 @@ export const site = {
   ],
 
   /**
-   * Horario: la web actual y Google Maps no coinciden (ver inventario).
-   * Se muestra el publicado en la web actual con aviso, y NO se incluye en
-   * los datos estructurados mientras `confirmed` sea false.
+   * Horario: la web actual (L-V 9:00–14:00 y 15:30–19:30) y Google Maps no
+   * coinciden (ver inventario). Mientras `confirmed` sea false NO se muestra:
+   * la web invita a llamar antes de la visita. Al confirmarlo, rellenar
+   * `lines` y poner `confirmed: true`.
    */
   hours: {
     confirmed: false,
     lines: ['Lunes a viernes', '9:00 – 14:00 y 15:30 – 19:30'],
-    note: 'Horario pendiente de actualización: le recomendamos llamar antes de visitarnos.',
+    note: 'Llámenos antes de su visita y le atenderemos personalmente.',
   },
 
   /** Opcionales: se activan solo cuando el propietario los confirme. */
@@ -60,3 +67,14 @@ export const primaryPhone = site.phones.find((p) => p.primary)!;
 export const primaryEmail = site.emails.find((e) => e.primary)!;
 
 export const fullAddress = `${site.address.street}, ${site.address.area}, ${site.address.postalCode} ${site.address.city}`;
+
+/** Texto sobre la trayectoria que respeta el estado de confirmación. */
+export const experience = site.foundingYearConfirmed
+  ? {
+      short: `Desde ${site.foundingYear}`,
+      text: `Más de 50 años en el sector y dos generaciones de profesionales para ofrecerle la mejor solución en calidad, aislamiento térmico y precio.`,
+    }
+  : {
+      short: 'Dos generaciones',
+      text: 'Dos generaciones de profesionales para ofrecerle la mejor solución en calidad, aislamiento térmico y precio.',
+    };

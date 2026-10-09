@@ -24,6 +24,7 @@ import imgArmarios from '../assets/products/frentes-armario.png';
 import imgMamparas from '../assets/products/mamparas-bano.png';
 import imgCerrajeria from '../assets/products/cerrajeria.png';
 import imgEstores from '../assets/products/estores.png';
+import imgPatio from '../assets/stock/patio-corredera-moderna.jpg';
 
 export type Block =
   | { type: 'p'; text: string }
@@ -933,7 +934,7 @@ export const products: Product[] = [
           {
             type: 'list',
             items: [
-              'Lonas acrílicas tejidas con hilo teñido en masa para evitar la decoloración, tratadas con fungicida contra el moho y acabadas en teflón para impermeabilizarlas. Con cinco años de garantía.',
+              'Lonas acrílicas tejidas con hilo teñido en masa para evitar la decoloración, tratadas con fungicida contra el moho y acabadas en teflón para impermeabilizarlas.',
               'Lonas microperforadas que permiten ver desde el interior.',
               'Distintos acabados y perfilerías para diferentes exigencias.',
             ],
@@ -1173,6 +1174,13 @@ export const products: Product[] = [
     legacyUrl: '/03_otros_productos_estores.html',
   },
 ];
+
+const categoryImages: Record<CategorySlug, ImageMetadata> = {
+  'sistemas-aluminio': imgPatio,
+  'materiales-adicionales': imgVidrios,
+  'otros-productos': imgToldos,
+};
+export const getCategoryImage = (slug: CategorySlug) => categoryImages[slug];
 
 export const getCategory = (slug: CategorySlug) => categories.find((c) => c.slug === slug)!;
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);

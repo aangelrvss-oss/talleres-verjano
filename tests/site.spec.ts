@@ -42,7 +42,7 @@ test.describe('Páginas', () => {
         }
       });
       await page.waitForLoadState('networkidle');
-      const broken = await page.$$eval('img', (imgs) => imgs.filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.src));
+      const broken = await page.$$eval('img', (imgs) => imgs.filter((i) => i.checkVisibility() && (!i.complete || i.naturalWidth === 0)).map((i) => i.src));
       expect(broken).toEqual([]);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow).toBeLessThanOrEqual(0);
@@ -67,7 +67,7 @@ test.describe('Páginas', () => {
         }
       });
       await page.waitForLoadState('networkidle');
-      const broken = await page.$$eval('img', (imgs) => imgs.filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.src));
+      const broken = await page.$$eval('img', (imgs) => imgs.filter((i) => i.checkVisibility() && (!i.complete || i.naturalWidth === 0)).map((i) => i.src));
       expect(broken, path).toEqual([]);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, path).toBeLessThanOrEqual(0);
@@ -84,47 +84,127 @@ test.describe('Páginas', () => {
 });
 
 test.describe('Navegación', () => {
-  test('el menú permite llegar a todas las fichas', async ({ page, isMobile }, testInfo) => {
+  const isNarrow = (page: Page) => (page.viewportSize()?.width ?? 1366) < 1100;
+
+  test('el menú «Productos» permite llegar a cualquier ficha', async ({ page }) => {
     await page.goto('/');
-    const narrow = (page.viewportSize()?.width ?? 1366) < 1100;
-    if (narrow) {
+    if (isNarrow(page)) {
       const menuBtn = page.getByRole('button', { name: 'Menú' });
       await menuBtn.click();
       await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
     }
-    const toggle = page.getByRole('button', { name: 'Mostrar sistemas en aluminio' });
-    await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await page.locator('#sub-0').getByRole('link', { name: 'Muro cortina' }).click();
+    const productos = page.getByRole('button', { name: 'Productos' });
+    await productos.click();
+    await expect(productos).toHaveAttribute('aria-expanded', 'true');
+    const mega = page.locator('#mega');
+    await expect(mega.getByRole('link', { name: 'Muro cortina' })).toBeVisible();
+    // 3 categorías + 15 fichas (+ accesos de presupuesto en escritorio)
+    expect(await mega.getByRole('link').count()).toBeGreaterThanOrEqual(18);
+    await mega.getByRole('link', { name: 'Muro cortina' }).click();
     await expect(page).toHaveURL(/\/sistemas-aluminio\/muro-cortina\/$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Muro cortina');
-    void isMobile;
-    void testInfo;
   });
 
-  test('navegación con teclado: enlace de salto y menú desplegable', async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 1100, 'Solo escritorio');
+  test('mega menú en escritorio: hover, clic, teclado y Escape', async ({ page }) => {
+    test.skip(isNarrow(page), 'Solo escritorio');
     await page.goto('/');
     await page.keyboard.press('Tab');
-    const skip = page.getByRole('link', { name: 'Saltar al contenido' });
-    await expect(skip).toBeFocused();
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#contenido')).toBeFocused();
+    await expect(page.getByRole('link', { name: 'Saltar al contenido' })).toBeFocused();
+    const productos = page.getByRole('button', { name: 'Productos' });
+    await productos.hover();
+    await expect(productos).toHaveAttribute('aria-expanded', 'true');
+    // Un clic justo después del hover no debe cerrarlo
+    await productos.click();
+    await expect(productos).toHaveAttribute('aria-expanded', 'true');
+    await page.mouse.move(10, 700);
+    await expect(productos).toHaveAttribute('aria-expanded', 'false');
 
-    const toggle = page.getByRole('button', { name: 'Mostrar materiales adicionales' });
-    await toggle.focus();
+    await productos.focus();
     await page.keyboard.press('Enter');
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.locator('#sub-1').getByRole('link', { name: 'Mosquiteras de aluminio' })).toBeVisible();
+    await expect(productos).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#mega a').first()).toBeFocused();
     await page.keyboard.press('Escape');
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    await expect(toggle).toBeFocused();
+    await expect(productos).toHaveAttribute('aria-expanded', 'false');
+    await expect(productos).toBeFocused();
   });
 
-  test('las migas de pan llevan a la categoría', async ({ page }) => {
+  test('menú móvil: se abre, se cierra con Escape y con el fondo', async ({ page }) => {
+    test.skip(!isNarrow(page), 'Solo móvil y tableta');
+    await page.goto('/empresa/');
+    const menuBtn = page.getByRole('button', { name: 'Menú' });
+    await menuBtn.click();
+    await expect(page.locator('#menu-principal')).toBeVisible();
+    await expect(page.locator('#menu-principal').getByRole('link', { name: 'Consejos' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'false');
+    await expect(menuBtn).toBeFocused();
+    await menuBtn.click();
+    await page.locator('[data-scrim]').click({ position: { x: 5, y: 300 }, force: true });
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('las migas de pan y el índice de la ficha llevan a la categoría', async ({ page }) => {
     await page.goto('/otros-productos/estores/');
     await page.getByRole('navigation', { name: 'Migas de pan' }).getByRole('link', { name: 'Otros productos' }).click();
     await expect(page).toHaveURL(/\/otros-productos\/$/);
+    await expect(page.getByRole('navigation', { name: 'Categorías del catálogo' }).getByRole('link', { name: /Otros productos/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  test('ficha: anterior/siguiente e índice con sección activa', async ({ page }) => {
+    await page.goto('/sistemas-aluminio/abatibles/');
+    const toc = page.getByRole('navigation', { name: 'En esta ficha' });
+    await toc.getByRole('link', { name: 'Documentación' }).click();
+    await expect(page).toHaveURL(/#documentacion$/);
+    await expect(toc.getByRole('link', { name: 'Documentación' })).toHaveAttribute('aria-current', 'true');
+    const pager = page.getByRole('navigation', { name: /Otras fichas/ });
+    await pager.getByRole('link', { name: /Siguiente/ }).click();
+    await expect(page).toHaveURL(/\/sistemas-aluminio\/correderas\/$/);
+  });
+});
+
+test.describe('Movimiento y accesibilidad', () => {
+  test('los bloques animados aparecen al hacer scroll', async ({ page }) => {
+    await page.goto('/');
+    const steps = page.locator('.step').last();
+    await steps.scrollIntoViewIfNeeded();
+    await expect(steps).toHaveClass(/is-in/);
+    await expect(steps).toHaveCSS('opacity', '1', { timeout: 3000 });
+  });
+
+  test('con movimiento reducido todo el contenido es visible sin desplazarse', async ({ browser }) => {
+    const ctx = await browser.newContext({ reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
+    await page.goto(new URL('/', test.info().project.use.baseURL).href);
+    const hidden = await page.$$eval('[data-reveal]', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length);
+    expect(hidden).toBe(0);
+    await ctx.close();
+  });
+
+  test('sin JavaScript el contenido sigue visible y navegable', async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto(new URL('/sistemas-aluminio/', test.info().project.use.baseURL).href);
+    const hidden = await page.$$eval('[data-reveal]', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length);
+    expect(hidden).toBe(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'Muro cortina' })).toBeVisible();
+    await ctx.close();
+  });
+
+  test('barra de contacto móvil: aparece al desplazarse y se oculta junto al formulario', async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 1366) >= 768, 'Solo móvil');
+    await page.goto('/');
+    const bar = page.getByRole('region', { name: 'Contacto rápido' });
+    await expect(bar).toBeHidden();
+    await page.evaluate(() => window.scrollTo(0, 1200));
+    await expect(bar).toBeVisible();
+    await expect(bar.getByRole('link', { name: 'Llamar' })).toHaveAttribute('href', 'tel:+34913038775');
+    await page.goto('/contacto/#presupuesto');
+    await page.locator('#presupuesto').scrollIntoViewIfNeeded();
+    await expect(bar).toBeHidden();
   });
 });
 
@@ -215,6 +295,7 @@ test.describe('Contacto', () => {
     await fillValid(page);
     const submit = page.getByRole('button', { name: 'Enviar solicitud' });
     await submit.click();
+    if (!REAL_BACKEND) await expect(page.locator('[data-submit]')).toHaveAttribute('aria-busy', 'true');
     const ok = page.getByRole('status').filter({ hasText: 'Solicitud enviada' });
     await expect(ok).toBeVisible({ timeout: 10_000 });
     await expect(ok).toBeFocused();

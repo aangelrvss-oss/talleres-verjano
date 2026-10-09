@@ -1,0 +1,89 @@
+---
+import { categories, productsIn, categoryUrl, type CategorySlug } from '../data/catalog';
+
+interface Props {
+  current?: CategorySlug;
+}
+
+const { current } = Astro.props;
+---
+
+<nav class="switch" aria-label="Categorías del catálogo">
+  <div class="container switch__inner">
+    {
+      categories.map((c) => (
+        <a class="switch__item" href={categoryUrl(c.slug)} aria-current={c.slug === current ? 'page' : undefined}>
+          {c.name}
+          <span class="switch__count">{productsIn(c.slug).length}</span>
+        </a>
+      ))
+    }
+  </div>
+</nav>
+
+<style>
+  .switch {
+    border-bottom: 1px solid var(--c-line);
+    background: var(--c-white);
+  }
+  .switch__inner {
+    display: flex;
+    gap: var(--s-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .switch__inner::-webkit-scrollbar {
+    display: none;
+  }
+  .switch__item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex: none;
+    padding: var(--s-4) var(--s-3);
+    color: var(--c-ink-soft);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .switch__item::after {
+    content: '';
+    position: absolute;
+    left: var(--s-3);
+    right: var(--s-3);
+    bottom: -1px;
+    height: 3px;
+    background: var(--c-brand);
+    transform: scaleX(0);
+    transition: transform 0.3s var(--ease-out);
+  }
+  .switch__item:hover {
+    color: var(--c-ink);
+  }
+  .switch__item:hover::after {
+    transform: scaleX(0.4);
+  }
+  .switch__item[aria-current]::after {
+    transform: scaleX(1);
+  }
+  .switch__item[aria-current] {
+    color: var(--c-ink);
+  }
+  .switch__count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--c-surface);
+    font-size: 0.75rem;
+    color: var(--c-ink-soft);
+  }
+  .switch__item[aria-current] .switch__count {
+    background: var(--c-brand);
+    color: var(--c-white);
+  }
+</style>

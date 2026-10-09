@@ -31,6 +31,7 @@
   --fs-xl: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
   --fs-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
   --fs-3xl: clamp(2.125rem, 1.6rem + 2.6vw, 3.5rem);
+  --fs-display: clamp(2.5rem, 1.55rem + 4.4vw, 5.25rem);
 
   /* Espaciado (base 4 px) */
   --s-1: 0.25rem;
@@ -51,6 +52,10 @@
   --radius-lg: 8px;
   --shadow-sm: 0 1px 2px rgb(20 32 46 / 0.06), 0 1px 1px rgb(20 32 46 / 0.04);
   --shadow-md: 0 12px 32px -12px rgb(20 32 46 / 0.22);
+  --shadow-lg: 0 30px 60px -24px rgb(13 22 32 / 0.45);
+  --c-ink-deep: #0d1620;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 0.7s;
   --header-h: 4.5rem;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -417,12 +422,22 @@ table {
 .field select,
 .field textarea {
   width: 100%;
-  min-height: 3rem;
-  padding: 0.7rem 0.9rem;
+  min-height: 3.25rem;
+  padding: 0.75rem 1rem;
   border: 1.5px solid var(--c-line-strong);
-  border-radius: var(--radius);
-  background: var(--c-white);
-  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  border-radius: 10px;
+  background: #fafbfa;
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.25s var(--ease),
+    background-color 0.2s var(--ease);
+}
+.field select {
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%233c4a5a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
 }
 .field textarea {
   min-height: 9rem;
@@ -438,7 +453,8 @@ table {
 .field textarea:focus-visible {
   outline: none;
   border-color: var(--c-blue);
-  box-shadow: 0 0 0 3px rgb(11 78 162 / 0.25);
+  background-color: var(--c-white);
+  box-shadow: 0 0 0 4px rgb(11 78 162 / 0.18);
 }
 .field [aria-invalid='true'] {
   border-color: var(--c-error);
@@ -456,4 +472,167 @@ table {
 }
 .req {
   color: var(--c-brand-dark);
+}
+
+/* ==========================================================================
+   v2 · Movimiento y componentes compartidos
+   ========================================================================== */
+
+/* ---------- Transiciones entre páginas (View Transitions nativas) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root) {
+    animation: 0.18s ease-out both vt-fade-out;
+  }
+  ::view-transition-new(root) {
+    animation: 0.32s var(--ease-out) both vt-fade-in;
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- Aparición al hacer scroll ----------
+   Solo se ocultan los elementos si hay JavaScript (clase .js en <html>) y
+   el usuario no ha pedido reducir el movimiento: sin JS todo es visible. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity var(--dur) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+    transition-delay: calc(var(--d, 0) * 90ms);
+  }
+  .js [data-reveal='fade'] {
+    transform: none;
+  }
+  .js [data-reveal='left'] {
+    transform: translate3d(-32px, 0, 0);
+  }
+  .js [data-reveal='right'] {
+    transform: translate3d(32px, 0, 0);
+  }
+  .js [data-reveal='image'] {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1s var(--ease-out);
+    transition-delay: calc(var(--d, 0) * 90ms);
+  }
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+  .js [data-reveal='image'].is-in {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---------- Botones: microinteracciones ---------- */
+.btn {
+  position: relative;
+  isolation: isolate;
+  transition:
+    background-color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease),
+    box-shadow 0.25s var(--ease),
+    transform 0.15s var(--ease);
+}
+.btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+.btn--primary {
+  box-shadow: 0 8px 20px -10px rgb(215 20 26 / 0.65);
+}
+.btn--primary:hover {
+  box-shadow: 0 12px 26px -10px rgb(215 20 26 / 0.7);
+}
+.btn .btn__arrow {
+  transition: transform 0.25s var(--ease-out);
+}
+.btn:hover .btn__arrow {
+  transform: translateX(4px);
+}
+.btn--lg {
+  min-height: 3.5rem;
+  padding: 0.95rem 1.75rem;
+  font-size: var(--fs-base);
+}
+.btn--block {
+  width: 100%;
+}
+
+/* ---------- Secciones oscuras ---------- */
+.section--ink {
+  background: var(--c-ink);
+  color: var(--c-white);
+}
+.section--ink .section-head p,
+.section--ink .lead {
+  color: #c9d2dc;
+}
+.section--ink .eyebrow {
+  color: #c9d2dc;
+}
+
+/* Titular de sección grande */
+.display {
+  font-size: var(--fs-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+.h-xl {
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+/* Imagen con zoom suave al pasar el ratón por su contenedor */
+.zoom-wrap {
+  overflow: hidden;
+}
+.zoom-wrap img {
+  transition: transform 0.9s var(--ease-out);
+}
+@media (hover: hover) {
+  .zoom-trigger:hover .zoom-wrap img {
+    transform: scale(1.045);
+  }
+}
+
+/* Marcador numérico (pasos, índices) */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Foco visible sobre fondos oscuros o rojos (contraste ≥ 3:1) */
+.hero :focus-visible,
+.page-hero :focus-visible,
+.section--ink :focus-visible,
+.footer :focus-visible,
+.quote-band :focus-visible,
+.cta-band :focus-visible,
+.mega__promo :focus-visible,
+.quote-card :focus-visible,
+.mbar :focus-visible,
+.map :focus-visible,
+.topbar :focus-visible,
+.tile :focus-visible {
+  outline-color: var(--c-white);
 }

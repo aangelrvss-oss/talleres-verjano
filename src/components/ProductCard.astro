@@ -2,89 +2,113 @@
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import type { Product } from '../data/catalog';
-import { productUrl } from '../data/catalog';
+import { productUrl, getCategory } from '../data/catalog';
 
 interface Props {
   product: Product;
   headingLevel?: 'h2' | 'h3';
   eager?: boolean;
+  showCategory?: boolean;
+  /** Retardo de aparición (índice) para animaciones escalonadas */
+  delay?: number;
 }
 
-const { product, headingLevel = 'h3', eager = false } = Astro.props;
+const { product, headingLevel = 'h3', eager = false, showCategory = false, delay = 0 } = Astro.props;
 const Heading = headingLevel;
 ---
 
-<article class="card">
-  <div class="card__media">
+<div class="card-wrap" data-reveal style={`--d:${delay}`}>
+<article class="card zoom-trigger">
+  <div class="card__media zoom-wrap">
     <Image
       src={product.image}
       alt=""
-      widths={[360, 560, 765]}
-      sizes="(max-width: 40rem) 100vw, (max-width: 75rem) 50vw, 380px"
+      widths={[380, 560, 765]}
+      sizes="(max-width: 40rem) calc(100vw - 2rem), (max-width: 75rem) 45vw, 380px"
       loading={eager ? 'eager' : 'lazy'}
     />
+    {showCategory && <span class="card__tag">{getCategory(product.category).name}</span>}
   </div>
   <div class="card__body">
     <Heading class="card__title">
       <a href={productUrl(product)}>{product.name}</a>
     </Heading>
     <p class="card__text">{product.tagline}</p>
-    <span class="card__more" aria-hidden="true">Ver ficha <Icon name="arrow" size={16} /></span>
+    <span class="card__more" aria-hidden="true">
+      Ver ficha
+      <span class="card__arrow"><Icon name="arrow" size={16} /></span>
+    </span>
   </div>
 </article>
+</div>
 
 <style>
+  .card-wrap {
+    display: flex;
+  }
   .card {
+    flex: 1;
     position: relative;
     display: flex;
     flex-direction: column;
     background: var(--c-white);
     border: 1px solid var(--c-line);
-    border-radius: var(--radius-lg);
+    border-radius: 12px;
     overflow: hidden;
     transition:
-      box-shadow 0.2s var(--ease),
-      border-color 0.2s var(--ease);
+      box-shadow 0.35s var(--ease-out),
+      transform 0.35s var(--ease-out),
+      border-color 0.35s var(--ease);
   }
-  .card:hover {
-    border-color: var(--c-line-strong);
-    box-shadow: var(--shadow-md);
+  @media (hover: hover) {
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: transparent;
+      box-shadow: var(--shadow-lg);
+    }
   }
   .card:focus-within {
     outline: 3px solid var(--c-blue);
     outline-offset: 2px;
   }
   .card__media {
-    aspect-ratio: 16 / 9;
+    position: relative;
+    aspect-ratio: 16 / 10;
     background: var(--c-surface);
-    overflow: hidden;
   }
   .card__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s var(--ease);
   }
-  .card:hover .card__media img {
-    transform: scale(1.03);
+  .card__tag {
+    position: absolute;
+    left: var(--s-3);
+    top: var(--s-3);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.92);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    color: var(--c-ink);
   }
   .card__body {
     display: grid;
     gap: var(--s-2);
     padding: var(--s-5);
     flex: 1;
-    align-content: start;
+    grid-template-rows: auto 1fr auto;
   }
   .card__title {
     font-size: var(--fs-lg);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
   .card__title a {
     color: var(--c-ink);
     text-decoration: none;
   }
   .card__title a::after {
-    /* Toda la tarjeta es clicable con un único enlace */
     content: '';
     position: absolute;
     inset: 0;
@@ -102,13 +126,26 @@ const Heading = headingLevel;
     gap: var(--s-2);
     margin-top: var(--s-2);
     font-size: var(--fs-sm);
-    font-weight: 700;
-    color: var(--c-blue);
+    font-weight: 750;
+    color: var(--c-ink);
   }
-  .card__more :global(svg) {
-    transition: transform 0.18s var(--ease);
+  .card__arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-line-strong);
+    transition:
+      background-color 0.25s var(--ease),
+      border-color 0.25s var(--ease),
+      color 0.25s var(--ease),
+      transform 0.35s var(--ease-out);
   }
-  .card:hover .card__more :global(svg) {
-    transform: translateX(3px);
+  .card:hover .card__arrow {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+    color: var(--c-white);
+    transform: translateX(4px);
   }
 </style>

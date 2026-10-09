@@ -2,6 +2,8 @@
 
 Nueva versión de [www.talleresverjano.com](https://www.talleresverjano.com/): sitio estático generado con [Astro](https://astro.build), con catálogo completo (15 fichas), formulario de presupuesto funcional, SEO técnico y redirecciones 301 desde las URL antiguas.
 
+**v2 (rediseño visual)**: hero editorial, mega menú de productos, fichas con índice y navegación entre productos, barra de contacto en móvil y animaciones nativas (View Transitions, aparición al hacer scroll) que respetan `prefers-reduced-motion`. Ver `docs/visual-audit.md` y `docs/design-system.md`.
+
 > **Estado**: listo para revisión. **No se ha publicado nada** ni se ha modificado el sitio actual. Antes del lanzamiento hay que resolver los puntos de [Pendientes del propietario](#pendientes-del-propietario).
 
 ## Documentación
@@ -9,6 +11,8 @@ Nueva versión de [www.talleresverjano.com](https://www.talleresverjano.com/): s
 | Documento | Contenido |
 |---|---|
 | [docs/audit-report.md](docs/audit-report.md) | Auditoría de la web actual |
+| [docs/visual-audit.md](docs/visual-audit.md) | Auditoría visual de la v1 y plan del rediseño (v2) |
+| [docs/image-credits.md](docs/image-credits.md) | Procedencia y licencias de las imágenes |
 | [docs/content-inventory.md](docs/content-inventory.md) | Inventario de contenido, datos comerciales y discrepancias |
 | [docs/design-system.md](docs/design-system.md) | Dirección visual, tokens y componentes |
 | [docs/technical-decisions.md](docs/technical-decisions.md) | Arquitectura y decisiones técnicas |
@@ -64,7 +68,10 @@ Playwright usa Chromium. En este entorno está preinstalado; en otro equipo: `np
 | Redirecciones | `docs/redirect-map.csv` (el `.htaccess` se regenera en cada `build`) |
 | Colores y tipografía | `src/styles/global.css` (tokens en `:root`) |
 
-Al confirmar el horario, cambie `hours.confirmed` a `true` en `site.ts`: desaparece el aviso «pendiente de confirmar». Si se quiere incluir en los datos estructurados, añada `openingHoursSpecification` en `src/data/schema.ts`.
+Datos pendientes de confirmar (en `src/data/site.ts`), ocultos mientras su indicador valga `false`:
+
+- `hours.confirmed`: al ponerlo a `true` se muestra el horario de `hours.lines` en el pie, la portada y el contacto. Si se quiere incluir en los datos estructurados, añada `openingHoursSpecification` en `src/data/schema.ts`.
+- `foundingYearConfirmed`: al ponerlo a `true` aparecen «Desde 1968» y «más de 50 años» en la portada, «La empresa» y el pie.
 
 ## Variables de entorno
 
@@ -132,5 +139,5 @@ Sirven `dist/` y usan `_redirects` (generado automáticamente), pero **no ejecut
 2. **Razón social y NIF** para el aviso legal, y revisión legal de `/privacidad/`.
 3. **Confirmar** o descartar: financiación sin intereses, reformas integrales, PVC Kömmerling, Somfy, Mago y Persax, WhatsApp en el móvil y redes sociales.
 4. **Buzón** que debe recibir el formulario y remitente del dominio (`TV_FORM_TO` y `TV_FORM_FROM`); comprobar SPF/DKIM.
-5. **Derechos de las imágenes** reutilizadas de la web actual (probablemente de fabricantes) y, si es posible, fotografías propias y el logo en vector.
+5. **Derechos de las imágenes** reutilizadas de la web actual (probablemente de fabricantes) y, si es posible, fotografías propias y el logo en vector. Descargar los originales de las 2 fotos de Unsplash (ver `docs/image-credits.md`).
 6. Confirmar la antigüedad («desde 1968») y la garantía de 5 años de las lonas de los toldos.

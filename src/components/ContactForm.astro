@@ -103,9 +103,10 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
 
     <div class="form__footer">
       <p class="hint"><span class="req" aria-hidden="true">*</span> Campos obligatorios</p>
-      <button class="btn btn--primary form__submit" type="submit" data-submit>
+      <button class="btn btn--primary btn--lg form__submit" type="submit" data-submit>
+        <span class="form__spinner" aria-hidden="true"></span>
         <span data-submit-label>Enviar solicitud</span>
-        <Icon name="arrow" size={18} />
+        <Icon name="arrow" size={18} class="btn__arrow" />
       </button>
     </div>
 
@@ -123,7 +124,7 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
   </form>
 
   <div class="form__status form__status--ok" role="status" tabindex="-1" hidden data-status-ok>
-    <Icon name="check" size={28} />
+    <span class="form__ok-icon"><Icon name="check" size={28} /></span>
     <div>
       <p class="form__ok-title">Solicitud enviada</p>
       <p>Gracias. Hemos recibido su mensaje y {site.name} se pondrá en contacto con usted lo antes posible.</p>
@@ -386,6 +387,77 @@ const { endpoint = '/api/contacto.php' } = Astro.props;
   }
   [hidden] {
     display: none !important;
+  }
+
+  /* Estado de envío: indicador de carga en el botón */
+  .form__spinner {
+    display: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid rgb(255 255 255 / 0.4);
+    border-top-color: var(--c-white);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .form__submit[aria-busy='true'] .form__spinner {
+    display: inline-block;
+  }
+  .form__submit[aria-busy='true'] :global(.btn__arrow) {
+    display: none;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Confirmación: aparición y check animado (solo tras confirmar el servidor) */
+  .form__ok-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--c-success);
+    color: var(--c-white);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .form__status--ok:not([hidden]) {
+      animation: ok-in 0.6s var(--ease-out) both;
+    }
+    .form__status--ok:not([hidden]) .form__ok-icon {
+      animation: ok-pop 0.7s var(--ease-out) 0.15s both;
+    }
+    .form__status--error:not([hidden]),
+    .form__summary:not([hidden]) {
+      animation: shake 0.45s var(--ease) both;
+    }
+  }
+  @keyframes ok-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes ok-pop {
+    0% {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+  }
+  @keyframes shake {
+    20%,
+    60% {
+      transform: translateX(-5px);
+    }
+    40%,
+    80% {
+      transform: translateX(5px);
+    }
   }
   @media (max-width: 40rem) {
     .form__grid {

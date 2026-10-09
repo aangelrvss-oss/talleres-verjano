@@ -5,8 +5,9 @@ import PageHero from '../components/PageHero.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import { categories, productsIn, categoryUrl } from '../data/catalog';
-import { site, fullAddress } from '../data/site';
+import { site, fullAddress, experience } from '../data/site';
 import img from '../assets/products/sistemas-correderas.png';
+import heroImg from '../assets/stock/fachada-ventanas-aluminio.jpg';
 
 const breadcrumbs = [
   { name: 'Inicio', href: '/' },
@@ -16,8 +17,8 @@ const breadcrumbs = [
 const pillars = [
   {
     icon: 'calendar',
-    title: `Contigo desde ${site.foundingYear}`,
-    text: 'Con más de 50 años en el sector y dos generaciones de profesionales, le ofrecemos la mejor solución en calidad, aislamiento térmico y precio.',
+    title: experience.short,
+    text: experience.text,
   },
   {
     icon: 'leaf',
@@ -33,20 +34,23 @@ const pillars = [
 ---
 
 <Base
-  title="La empresa: carpintería de aluminio desde 1968"
-  description="Talleres Verjano: dos generaciones fabricando e instalando carpintería de aluminio en Madrid desde 1968. Exposición y fábrica en el P.I. La Cerámica (Vallecas)."
+  title="La empresa: carpintería de aluminio en Madrid"
+  description="Talleres Verjano: dos generaciones fabricando e instalando carpintería de aluminio en Madrid. Exposición y fábrica en el P.I. La Cerámica (Vallecas)."
   breadcrumbs={breadcrumbs}
 >
   <PageHero
     title="Dos generaciones dedicadas a la carpintería de aluminio"
     eyebrow="La empresa"
-    lead={`${site.name} fabrica e instala ventanas, puertas y cerramientos en Madrid desde ${site.foundingYear}. Nuestra exposición y fábrica está en el Polígono Industrial La Cerámica, en Puente de Vallecas.`}
+    lead={`${site.name} fabrica e instala ventanas, puertas y cerramientos en Madrid${site.foundingYearConfirmed ? ` desde ${site.foundingYear}` : ''}. Nuestra exposición y fábrica está en el Polígono Industrial La Cerámica, en Puente de Vallecas.`}
     breadcrumbs={breadcrumbs}
+    image={heroImg}
+    imageAlt="Ventanas de aluminio proyectantes en una fachada"
+    imageCaption="Imagen ilustrativa."
   />
 
   <section class="section">
     <div class="container about">
-      <div class="prose about__text">
+      <div class="prose about__text" data-reveal>
         <h2>Fabricantes e instaladores</h2>
         <p>
           Somos fabricantes e instaladores de carpintería de aluminio. Trabajamos con perfiles de QSystems, empresa española de referencia, y con vidrios SGG Climalit, y completamos cada proyecto con persianas, automatismos, mosquiteras y protección solar.
@@ -59,7 +63,7 @@ const pillars = [
           Cada hueco es distinto. Nuestros técnicos le asesoran sobre el sistema de apertura, la serie de perfil y la composición del vidrio más adecuados teniendo en cuenta la orientación, el viento y el ruido de la zona. Le aconsejamos sin compromiso.
         </p>
       </div>
-      <figure class="about__media">
+      <figure class="about__media" data-reveal="image">
         <Image src={img} alt="Corredera de aluminio de gran formato en un salón luminoso" widths={[480, 765]} sizes="(max-width: 62rem) 100vw, 520px" />
         <figcaption>Imagen ilustrativa.</figcaption>
       </figure>
@@ -68,14 +72,14 @@ const pillars = [
 
   <section class="section section--surface" aria-labelledby="valores-title">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head" data-reveal>
         <p class="eyebrow">Nuestros valores</p>
-        <h2 id="valores-title">Lo que nos define</h2>
+        <h2 id="valores-title" class="h-xl">Lo que nos define</h2>
       </div>
       <ul class="pillars">
         {
-          pillars.map((p) => (
-            <li>
+          pillars.map((p, i) => (
+            <li data-reveal style={`--d:${i}`}>
               <Icon name={p.icon} size={28} />
               <h3>{p.title}</h3>
               <p>{p.text}</p>
@@ -88,14 +92,14 @@ const pillars = [
 
   <section class="section" aria-labelledby="que-hacemos-title">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head" data-reveal>
         <p class="eyebrow">Qué hacemos</p>
-        <h2 id="que-hacemos-title">Nuestras líneas de producto</h2>
+        <h2 id="que-hacemos-title" class="h-xl">Nuestras líneas de producto</h2>
       </div>
       <ul class="lines">
         {
-          categories.map((c) => (
-            <li>
+          categories.map((c, i) => (
+            <li data-reveal style={`--d:${i}`}>
               <a href={categoryUrl(c.slug)}>
                 <span class="lines__name">{c.name}</span>
                 <span class="lines__items">{productsIn(c.slug).map((p) => p.name).join(' · ')}</span>
@@ -108,7 +112,7 @@ const pillars = [
       <p class="visit">
         <Icon name="pin" size={20} />
         <span><strong>{site.address.label}:</strong> {fullAddress}.</span>
-        <a href="/contacto/">Cómo llegar y horario</a>
+        <a href="/contacto/">Cómo llegar</a>
       </p>
     </div>
   </section>
@@ -151,6 +155,8 @@ const pillars = [
     padding: var(--s-6) var(--s-5);
     background: var(--c-white);
     border-top: 3px solid var(--c-brand);
+    border-radius: 0 0 12px 12px;
+    box-shadow: var(--shadow-sm);
   }
   .pillars :global(svg) {
     color: var(--c-brand);
@@ -174,6 +180,12 @@ const pillars = [
     border-bottom: 1px solid var(--c-line);
     color: var(--c-ink);
     text-decoration: none;
+  }
+  .lines a {
+    transition: padding-left 0.35s var(--ease-out);
+  }
+  .lines a:hover {
+    padding-left: var(--s-3);
   }
   .lines a:hover .lines__name {
     color: var(--c-blue);

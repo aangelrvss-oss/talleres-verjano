@@ -3,7 +3,8 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { categories, productsIn, categoryUrl, type Category } from '../../data/catalog';
+import CategorySwitch from '../../components/CategorySwitch.astro';
+import { categories, productsIn, categoryUrl, getCategoryImage, type Category } from '../../data/catalog';
 
 export function getStaticPaths() {
   return categories.map((category) => ({ params: { category: category.slug }, props: { category } }));
@@ -15,77 +16,31 @@ interface Props {
 
 const { category } = Astro.props;
 const items = productsIn(category.slug);
-const others = categories.filter((c) => c.slug !== category.slug);
 const breadcrumbs = [
   { name: 'Inicio', href: '/' },
   { name: category.name, href: categoryUrl(category.slug) },
 ];
 ---
 
-<Base title={category.metaTitle} description={category.metaDescription} ogImage={items[0].image} breadcrumbs={breadcrumbs}>
-  <PageHero title={category.name} eyebrow="Catálogo" lead={category.intro} breadcrumbs={breadcrumbs} />
+<Base title={category.metaTitle} description={category.metaDescription} ogImage={getCategoryImage(category.slug)} breadcrumbs={breadcrumbs}>
+  <PageHero
+    title={category.name}
+    eyebrow={`Catálogo · ${items.length} ${category.slug === 'sistemas-aluminio' ? 'sistemas' : 'productos'}`}
+    lead={category.intro}
+    breadcrumbs={breadcrumbs}
+    image={getCategoryImage(category.slug)}
+    imageCaption="Imagen ilustrativa."
+  />
+
+  <CategorySwitch current={category.slug} />
 
   <section class="section" aria-label={`Productos de ${category.name.toLowerCase()}`}>
     <div class="container">
       <div class="grid grid--3">
-        {items.map((p, i) => <ProductCard product={p} headingLevel="h2" eager={i < 3} />)}
+        {items.map((p, i) => <ProductCard product={p} headingLevel="h2" eager={i < 3} delay={i % 3} />)}
       </div>
-    </div>
-  </section>
-
-  <section class="section section--surface" aria-labelledby="otras-title">
-    <div class="container">
-      <h2 id="otras-title" class="others__title">Explore también</h2>
-      <ul class="others">
-        {
-          others.map((c) => (
-            <li>
-              <a href={categoryUrl(c.slug)}>
-                <span class="others__name">{c.name}</span>
-                <span class="others__count">{productsIn(c.slug).length} productos</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </section>
 
   <CtaBand />
 </Base>
-
-<style>
-  .others__title {
-    font-size: var(--fs-xl);
-    margin-bottom: var(--s-5);
-  }
-  .others {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-    gap: var(--s-4);
-  }
-  .others a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--s-4);
-    padding: var(--s-5);
-    background: var(--c-white);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-  }
-  .others a:hover {
-    border-color: var(--c-blue);
-  }
-  .others__name {
-    font-weight: 750;
-    font-size: var(--fs-lg);
-    color: var(--c-ink);
-  }
-  .others__count {
-    font-size: var(--fs-sm);
-    color: var(--c-muted);
-  }
-</style>

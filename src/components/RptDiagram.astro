@@ -1,0 +1,208 @@
+---
+/**
+ * Esquema ilustrativo (no a escala) de un perfil de aluminio con rotura de
+ * puente térmico y doble acristalamiento. Explica el texto ya publicado en las
+ * fichas; no representa ninguna serie concreta.
+ * Se dibuja al entrar en pantalla ([data-reveal]); estático con movimiento reducido.
+ */
+---
+
+<figure class="rpt" data-reveal="fade">
+  <svg viewBox="0 0 560 430" role="img" aria-labelledby="rpt-title rpt-desc">
+    <title id="rpt-title">Esquema de un perfil con rotura de puente térmico</title>
+    <desc id="rpt-desc">
+      Sección de una ventana: perfil exterior e interior de aluminio separados por pletinas de poliamida, con un doble
+      acristalamiento separado por una cámara. El calor del interior queda frenado en la barrera.
+    </desc>
+
+    <!-- Zonas -->
+    <text class="rpt__zone" x="40" y="28">Exterior</text>
+    <text class="rpt__zone" x="520" y="28" text-anchor="end">Interior</text>
+
+    <!-- Doble acristalamiento -->
+    <g class="rpt__glass">
+      <rect x="226" y="46" width="12" height="196" rx="1.5"></rect>
+      <rect x="302" y="46" width="12" height="196" rx="1.5"></rect>
+      <rect class="rpt__cavity" x="238" y="46" width="64" height="196"></rect>
+      <rect class="rpt__spacer" x="238" y="226" width="64" height="14" rx="2"></rect>
+    </g>
+
+    <!-- Perfiles de aluminio -->
+    <g class="rpt__alu">
+      <path class="rpt__draw" d="M168 250 H262 V392 H168 Z"></path>
+      <path class="rpt__draw" d="M182 266 H248 V312 H182 Z M182 326 H248 V376 H182 Z"></path>
+      <path class="rpt__draw" d="M298 250 H392 V392 H298 Z"></path>
+      <path class="rpt__draw" d="M312 266 H378 V312 H312 Z M312 326 H378 V376 H312 Z"></path>
+      <path class="rpt__draw" d="M214 250 V236 H226 M326 250 V236 H314"></path>
+    </g>
+
+    <!-- Pletinas de poliamida (la rotura) -->
+    <g class="rpt__barrier">
+      <rect x="262" y="270" width="36" height="16" rx="3"></rect>
+      <rect x="262" y="356" width="36" height="16" rx="3"></rect>
+    </g>
+
+    <!-- Juntas -->
+    <g class="rpt__gasket">
+      <circle cx="220" cy="236" r="5"></circle>
+      <circle cx="320" cy="236" r="5"></circle>
+    </g>
+
+    <!-- Flujo de calor frenado -->
+    <g class="rpt__heat">
+      <path d="M520 320 C470 320 440 320 404 320" marker-end="url(#rpt-arrow)"></path>
+      <path class="rpt__heat-weak" d="M164 320 C140 320 118 320 96 320"></path>
+      <text x="520" y="306" text-anchor="end">Calor del interior</text>
+    </g>
+
+    <!-- Rótulos -->
+    <g class="rpt__labels">
+      <line x1="232" y1="96" x2="120" y2="96"></line>
+      <text x="40" y="92">Doble</text>
+      <text x="40" y="110">acristalamiento</text>
+      <line x1="270" y1="150" x2="420" y2="150"></line>
+      <text x="428" y="155">Cámara</text>
+      <line x1="280" y1="364" x2="280" y2="412"></line>
+      <text class="rpt__key" x="280" y="426" text-anchor="middle">Pletinas de poliamida: rotura de puente térmico</text>
+      <line x1="168" y1="392" x2="120" y2="404"></line>
+      <text x="40" y="404">Perfil exterior</text>
+      <line x1="392" y1="392" x2="436" y2="404"></line>
+      <text x="444" y="404">Perfil interior</text>
+    </g>
+
+    <defs>
+      <marker id="rpt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z"></path>
+      </marker>
+    </defs>
+  </svg>
+  <figcaption>Esquema ilustrativo, no a escala.</figcaption>
+</figure>
+
+<style>
+  .rpt {
+    margin: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--f-sans);
+  }
+  .rpt__zone {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    fill: #9eabb8;
+  }
+  .rpt__glass rect {
+    fill: rgb(170 210 240 / 0.55);
+    stroke: #8fc1e6;
+    stroke-width: 1;
+  }
+  .rpt__glass .rpt__cavity {
+    fill: rgb(170 210 240 / 0.12);
+    stroke: none;
+  }
+  .rpt__glass .rpt__spacer {
+    fill: #5b6775;
+    stroke: none;
+  }
+  .rpt__alu path {
+    fill: none;
+    stroke: #d5dce3;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+  .rpt__alu path:nth-child(1),
+  .rpt__alu path:nth-child(3) {
+    fill: rgb(213 220 227 / 0.12);
+  }
+  .rpt__barrier rect {
+    fill: var(--c-brand);
+  }
+  .rpt__gasket circle {
+    fill: #0d1620;
+    stroke: #9eabb8;
+    stroke-width: 1.5;
+  }
+  .rpt__heat path {
+    fill: none;
+    stroke: #ff8a8d;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .rpt__heat .rpt__heat-weak {
+    stroke-dasharray: 2 7;
+    opacity: 0.6;
+  }
+  .rpt__heat marker path,
+  #rpt-arrow path {
+    fill: #ff8a8d;
+  }
+  .rpt__heat text {
+    font-size: 12px;
+    font-weight: 700;
+    fill: #ff8a8d;
+  }
+  .rpt__labels line {
+    stroke: #6f7d8c;
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .rpt__labels text {
+    font-size: 13px;
+    font-weight: 650;
+    fill: #c9d2dc;
+  }
+  .rpt__labels .rpt__key {
+    font-weight: 800;
+    fill: var(--c-white);
+  }
+  figcaption {
+    font-size: var(--fs-xs);
+    color: #9eabb8;
+  }
+
+  /* Animación de dibujo */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .rpt .rpt__draw {
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      transition: stroke-dashoffset 1.6s var(--ease-out);
+    }
+    :global(.js) .rpt.is-in .rpt__draw {
+      stroke-dashoffset: 0;
+    }
+    :global(.js) .rpt .rpt__barrier rect {
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: scaleX(0);
+      transition: transform 0.6s var(--ease-out) 0.9s;
+    }
+    :global(.js) .rpt.is-in .rpt__barrier rect {
+      transform: none;
+    }
+    :global(.js) .rpt .rpt__labels,
+    :global(.js) .rpt .rpt__heat {
+      opacity: 0;
+      transition: opacity 0.6s var(--ease) 1.2s;
+    }
+    :global(.js) .rpt.is-in .rpt__labels,
+    :global(.js) .rpt.is-in .rpt__heat {
+      opacity: 1;
+    }
+    :global(.js) .rpt.is-in .rpt__heat path:first-child {
+      stroke-dasharray: 10 8;
+      animation: heat-flow 1.2s linear 3;
+    }
+  }
+  @keyframes heat-flow {
+    to {
+      stroke-dashoffset: -18;
+    }
+  }
+</style>

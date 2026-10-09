@@ -10,7 +10,10 @@ const year = new Date().getFullYear();
   <div class="container footer__grid">
     <div class="footer__about">
       <p class="footer__name">{site.name}</p>
-      <p>Carpintería de aluminio en Madrid desde {site.foundingYear}. Fabricación e instalación de ventanas, puertas y cerramientos.</p>
+      <p>
+        Carpintería de aluminio en Madrid{site.foundingYearConfirmed && ` desde ${site.foundingYear}`}. Fabricación e instalación de ventanas, puertas y
+        cerramientos.
+      </p>
       <ul class="footer__contact">
         <li>
           <Icon name="pin" size={18} />
@@ -39,7 +42,7 @@ const year = new Date().getFullYear();
         }
         <li>
           <Icon name="clock" size={18} />
-          <span>{site.hours.lines.join(': ')}{!site.hours.confirmed && <span class="footer__note"> (pendiente de confirmar)</span>}</span>
+          <span>{site.hours.confirmed ? site.hours.lines.join(': ') : site.hours.note}</span>
         </li>
       </ul>
     </div>
@@ -146,6 +149,12 @@ const year = new Date().getFullYear();
   }
   .footer__bottom {
     border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  @media (max-width: 47.99rem) {
+    /* Hueco para la barra de contacto fija en móvil */
+    .footer {
+      padding-bottom: 5.5rem;
+    }
   }
   .footer__bottom-inner {
     display: flex;

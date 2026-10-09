@@ -5,23 +5,29 @@ import { primaryPhone } from '../data/site';
 interface Props {
   title?: string;
   text?: string;
+  /** Destino del botón principal (p. ej. con producto preseleccionado) */
+  href?: string;
 }
 
 const {
   title = '¿Hablamos de su proyecto?',
   text = 'Le asesoramos sin compromiso sobre el sistema, el vidrio y los complementos que mejor se adaptan a su vivienda o local.',
+  href = '/contacto/#presupuesto',
 } = Astro.props;
 ---
 
 <section class="cta-band" aria-labelledby="cta-title">
   <div class="container cta-band__inner">
-    <div class="cta-band__text">
+    <div class="cta-band__text" data-reveal>
+      <p class="eyebrow">Presupuesto sin compromiso</p>
       <h2 id="cta-title">{title}</h2>
       <p>{text}</p>
     </div>
-    <div class="cta-band__actions">
-      <a class="btn btn--primary" href="/contacto/#presupuesto">Pedir presupuesto</a>
-      <a class="btn btn--outline-light" href={primaryPhone.href}>
+    <div class="cta-band__actions" data-reveal style="--d:1">
+      <a class="btn btn--light btn--lg" href={href}>
+        Pedir presupuesto <Icon name="arrow" size={18} class="btn__arrow" />
+      </a>
+      <a class="btn btn--outline-light btn--lg" href={primaryPhone.href}>
         <Icon name="phone" size={18} />
         {primaryPhone.display}
       </a>
@@ -31,10 +37,10 @@ const {
 
 <style>
   .cta-band {
-    background:
-      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px) 0 0 / 6rem 100%,
-      var(--c-ink);
     color: var(--c-white);
+    background:
+      radial-gradient(60rem 30rem at 100% 0%, rgb(255 255 255 / 0.14), transparent 60%),
+      linear-gradient(120deg, var(--c-brand-dark), var(--c-brand));
   }
   .cta-band__inner {
     display: flex;
@@ -42,23 +48,34 @@ const {
     align-items: center;
     justify-content: space-between;
     gap: var(--s-6);
-    padding-block: clamp(3rem, 6vw, 4.5rem);
+    padding-block: clamp(3rem, 7vw, 5rem);
   }
   .cta-band__text {
     display: grid;
     gap: var(--s-3);
     max-width: 40rem;
   }
-  h2 {
-    font-size: var(--fs-2xl);
+  .eyebrow {
+    color: #ffe1e2;
   }
-  p {
-    color: #c9d2dc;
+  .eyebrow::before {
+    background: var(--c-white);
+  }
+  h2 {
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  p:not(.eyebrow) {
+    color: #ffe9ea;
     font-size: var(--fs-lg);
   }
   .cta-band__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
+  }
+  .btn--light {
+    --btn-fg: var(--c-brand-dark);
   }
 </style>
